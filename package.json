@@ -1,0 +1,8 @@
+{
+  "name": "plumeria-stylex-benchmark",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "benchmark": "node scripts/benchmark.mjs"
+  }
+}
