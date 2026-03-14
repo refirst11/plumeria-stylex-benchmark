@@ -1,6 +1,6 @@
-import * as css from "@plumeria/core";
+import * as style from "@plumeria/core";
 
-const styles = css.create({
+const styles = style.create({
   base: {
     display: "inline-block",
     fontWeight: "500",
@@ -37,7 +37,7 @@ const styles = css.create({
   bgLightGreen: { backgroundColor: "#e8f5e9" },
 });
 
-const getVariants = css.variants({
+const getVariants = style.variants({
   color: {
     red: styles.red,
     blue: styles.blue,
@@ -91,7 +91,7 @@ const Test = ({
 }: TestProps) => {
   return (
     <div
-      className={css.use(
+      className={style.use(
         styles.base,
         getVariants({
           color,
