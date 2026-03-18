@@ -1,7 +1,7 @@
-# CSS-in-JS Benchmark: Plumeria vs StyleX
+# CSS-in-JS Benchmark: StyleX vs Plumeria
 
 This repository benchmarks two next-generation CSS-in-JS libraries:
-**Plumeria** and Meta's **StyleX**.
+Meta's **StyleX** and **Plumeria**.
 
 ## Comparison Items
 
@@ -27,9 +27,9 @@ For a fair comparison, both projects replicate the exact same component structur
 - `padding` (5 types)
 - `borderRadius` (5 types)
 - `background` (5 types)
-- Plumeria uses the `css.variants` API, while StyleX uses object references with bracket notation.
+- While StyleX uses object references with bracket notation, Plumeria uses the `css.variants` API.
 
-2. **Complex Styles Test (`PlumeriaComponent.tsx/StyleXComponent.tsx`)**:
+2. **Complex Styles Test (`StyleXComponent.tsx/PlumeriaComponent.tsx`)**:
 
 - Nested media queries (`@media`).
 - Pseudo-classes (`:last-child`).
@@ -39,7 +39,7 @@ For a fair comparison, both projects replicate the exact same component structur
 
 - **Framework**: Next.js 16.1.6 (Turbopack mode)
 - **React**: 19.2.4
-- **Libraries**: Plumeria 9.0.0 / StyleX 0.17.5
+- **Libraries**: StyleX 0.17.5 / Plumeria 9.0.4
 - **Node.js**: v25.3.0
 - **pnpm**: v10.15.0
 - **OS**: macOS Tahoe
@@ -50,8 +50,8 @@ For a fair comparison, both projects replicate the exact same component structur
 
 | Library      | Avg Build (s) | Min (s) | Max (s) | CSS Size (KB) | Lighthouse (Perf) |
 | :----------- | :-----------: | :-----: | :-----: | :-----------: | :---------------: |
-| **Plumeria** |    4.244s     | 4.137s  | 4.888s  |    6.36KB     |      100/100      |
 | **StyleX**   |    4.621s     | 4.473s  | 5.209s  |    6.78KB     |      100/100      |
+| **Plumeria** |    4.244s     | 4.137s  | 4.888s  |    6.36KB     |      100/100      |
 
 > [!NOTE]
 >
@@ -74,6 +74,6 @@ npm run benchmark
 To run individually in each project directory:
 
 ```bash
-cd plumeria-next && npm run build
 cd stylex-next && npm run build
+cd plumeria-next && npm run build
 ```
