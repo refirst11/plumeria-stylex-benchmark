@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       next:
-        specifier: ^16.1.6
-        version: 16.1.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: ^16.2.2
+        version: 16.2.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -19,17 +19,17 @@ importers:
         version: 19.2.4(react@19.2.4)
     devDependencies:
       '@plumeria/core':
-        specifier: 9.0.0
-        version: 9.0.0
+        specifier: ^10.0.4
+        version: 10.0.4
       '@plumeria/eslint-plugin':
-        specifier: 9.0.0
-        version: 9.0.0
+        specifier: ^10.0.4
+        version: 10.0.4
       '@plumeria/next-plugin':
-        specifier: 9.0.0
-        version: 9.0.0
+        specifier: ^10.0.4
+        version: 10.0.4
       '@plumeria/postcss-plugin':
-        specifier: 9.0.0
-        version: 9.0.0
+        specifier: ^10.0.4
+        version: 10.0.4
       '@types/node':
         specifier: ^24.8.1
         version: 24.10.4
@@ -248,53 +248,53 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@next/env@16.1.6':
-    resolution: {integrity: sha512-N1ySLuZjnAtN3kFnwhAwPvZah8RJxKasD7x1f8shFqhncnWZn4JMfg37diLNuoHsLAlrDfM3g4mawVdtAG8XLQ==}
+  '@next/env@16.2.2':
+    resolution: {integrity: sha512-LqSGz5+xGk9EL/iBDr2yo/CgNQV6cFsNhRR2xhSXYh7B/hb4nePCxlmDvGEKG30NMHDFf0raqSyOZiQrO7BkHQ==}
 
-  '@next/swc-darwin-arm64@16.1.6':
-    resolution: {integrity: sha512-wTzYulosJr/6nFnqGW7FrG3jfUUlEf8UjGA0/pyypJl42ExdVgC6xJgcXQ+V8QFn6niSG2Pb8+MIG1mZr2vczw==}
+  '@next/swc-darwin-arm64@16.2.2':
+    resolution: {integrity: sha512-B92G3ulrwmkDSEJEp9+XzGLex5wC1knrmCSIylyVeiAtCIfvEJYiN3v5kXPlYt5R4RFlsfO/v++aKV63Acrugg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@next/swc-darwin-x64@16.1.6':
-    resolution: {integrity: sha512-BLFPYPDO+MNJsiDWbeVzqvYd4NyuRrEYVB5k2N3JfWncuHAy2IVwMAOlVQDFjj+krkWzhY2apvmekMkfQR0CUQ==}
+  '@next/swc-darwin-x64@16.2.2':
+    resolution: {integrity: sha512-7ZwSgNKJNQiwW0CKhNm9B1WS2L1Olc4B2XY0hPYCAL3epFnugMhuw5TMWzMilQ3QCZcCHoYm9NGWTHbr5REFxw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@next/swc-linux-arm64-gnu@16.1.6':
-    resolution: {integrity: sha512-OJYkCd5pj/QloBvoEcJ2XiMnlJkRv9idWA/j0ugSuA34gMT6f5b7vOiCQHVRpvStoZUknhl6/UxOXL4OwtdaBw==}
+  '@next/swc-linux-arm64-gnu@16.2.2':
+    resolution: {integrity: sha512-c3m8kBHMziMgo2fICOP/cd/5YlrxDU5YYjAJeQLyFsCqVF8xjOTH/QYG4a2u48CvvZZSj1eHQfBCbyh7kBr30Q==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@next/swc-linux-arm64-musl@16.1.6':
-    resolution: {integrity: sha512-S4J2v+8tT3NIO9u2q+S0G5KdvNDjXfAv06OhfOzNDaBn5rw84DGXWndOEB7d5/x852A20sW1M56vhC/tRVbccQ==}
+  '@next/swc-linux-arm64-musl@16.2.2':
+    resolution: {integrity: sha512-VKLuscm0P/mIfzt+SDdn2+8TNNJ7f0qfEkA+az7OqQbjzKdBxAHs0UvuiVoCtbwX+dqMEL9U54b5wQ/aN3dHeg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@next/swc-linux-x64-gnu@16.1.6':
-    resolution: {integrity: sha512-2eEBDkFlMMNQnkTyPBhQOAyn2qMxyG2eE7GPH2WIDGEpEILcBPI/jdSv4t6xupSP+ot/jkfrCShLAa7+ZUPcJQ==}
+  '@next/swc-linux-x64-gnu@16.2.2':
+    resolution: {integrity: sha512-kU3OPHJq6sBUjOk7wc5zJ7/lipn8yGldMoAv4z67j6ov6Xo/JvzA7L7LCsyzzsXmgLEhk3Qkpwqaq/1+XpNR3g==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@next/swc-linux-x64-musl@16.1.6':
-    resolution: {integrity: sha512-oicJwRlyOoZXVlxmIMaTq7f8pN9QNbdes0q2FXfRsPhfCi8n8JmOZJm5oo1pwDaFbnnD421rVU409M3evFbIqg==}
+  '@next/swc-linux-x64-musl@16.2.2':
+    resolution: {integrity: sha512-CKXRILyErMtUftp+coGcZ38ZwE/Aqq45VMCcRLr2I4OXKrgxIBDXHnBgeX/UMil0S09i2JXaDL3Q+TN8D/cKmg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@next/swc-win32-arm64-msvc@16.1.6':
-    resolution: {integrity: sha512-gQmm8izDTPgs+DCWH22kcDmuUp7NyiJgEl18bcr8irXA5N2m2O+JQIr6f3ct42GOs9c0h8QF3L5SzIxcYAAXXw==}
+  '@next/swc-win32-arm64-msvc@16.2.2':
+    resolution: {integrity: sha512-sS/jSk5VUoShUqINJFvNjVT7JfR5ORYj/+/ZpOYbbIohv/lQfduWnGAycq2wlknbOql2xOR0DoV0s6Xfcy49+g==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@next/swc-win32-x64-msvc@16.1.6':
-    resolution: {integrity: sha512-NRfO39AIrzBnixKbjuo2YiYhB6o9d8v/ymU9m/Xk8cyVk+k7XylniXkHwjs4s70wedVffc6bQNbufk5v0xEm0A==}
+  '@next/swc-win32-x64-msvc@16.2.2':
+    resolution: {integrity: sha512-aHaKceJgdySReT7qeck5oShucxWRiiEuwCGK8HHALe6yZga8uyFpLkPgaRw3kkF04U7ROogL/suYCNt/+CuXGA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
@@ -339,84 +339,84 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@plumeria/compiler@9.0.0':
-    resolution: {integrity: sha512-m3q3WlpQwwE8FZaQVdCK1dLYuBpyb/3roYtMizz5HBef0yljiEb2w6tPnMThJeLYwkHqXOLTt3pMBTEXjUZeGg==}
+  '@plumeria/compiler@10.0.4':
+    resolution: {integrity: sha512-1XRnlTUPKiHcPAzlZaCpoh4JdwEGBeEcXfRMvhrOMVYptN/d7VLEweJ75qCSZT+M4gIkfGEvBHvmUxlgp1nXdQ==}
 
-  '@plumeria/core@9.0.0':
-    resolution: {integrity: sha512-IEy/Aus5cQLUoghIizGRkpabVxz2XtYv2CezuiQeQGZUlUBHFbhEI3PGOT5adCoZOiMOBJ5BT/vmyWMlY8vIPQ==}
+  '@plumeria/core@10.0.4':
+    resolution: {integrity: sha512-An44c3RtOxc4cPb08x9sUmwrku6iySibsBTg5WK6AwkSZGXtonSV87Y8EEy/9SD2PDSSwsT7I22RD8UOqGNE+w==}
 
-  '@plumeria/eslint-plugin@9.0.0':
-    resolution: {integrity: sha512-jpbk9MpPWQndfz+gT1JXgZY79JZppmXQfoQxE6uuH0PCEje5F9VyUa5exzgHITmWIyuo0nIuo3WZkJWekju0jQ==}
+  '@plumeria/eslint-plugin@10.0.4':
+    resolution: {integrity: sha512-WkpBBl5AzSYFUKhoF4ftO5YiPBNXtwQPDNEgHUdYGx1CuCas3M0jwnxQP5bOVSPICM+Uz21NEGho4l6azWyQ8g==}
     hasBin: true
 
-  '@plumeria/next-plugin@9.0.0':
-    resolution: {integrity: sha512-XHPDqRc0AP48iOBBegmffQDQkYik/siX9gDzeYsF4OwygMOAKEZGenktEO4MGS9uwLY2D5c2dnZQzHeGS6sztA==}
+  '@plumeria/next-plugin@10.0.4':
+    resolution: {integrity: sha512-Xtv5gs/IAxXQznBM+x1Po2YzuW0H1pUKJOxb5YoaD+V399nJNHAx7u5jCAyhEqB9WQwAu81W0RmGiKxRrsiqqQ==}
 
-  '@plumeria/postcss-plugin@9.0.0':
-    resolution: {integrity: sha512-Mj8YxaOZiZ0rWKiidBPdDwR5den9xRoFf5DcGOL+FkpxMFaXyXJSnNcOPuc+DOlOSEd7ItsDNWynJoNvlBousQ==}
+  '@plumeria/postcss-plugin@10.0.4':
+    resolution: {integrity: sha512-yJdj3NfSy0AUElVkyoj6ZeFs5yzn4OD6NW1pYLEKq1rTQfTONYa0/bUMjPX7YfgB571pSHnvlMiXGpcYAB4fAA==}
 
-  '@plumeria/turbopack-loader@9.0.0':
-    resolution: {integrity: sha512-JEeAwzKfpAYsrEOQxSrunJc5BwLVFDXfUkN+5V9gRYs5fiPAdIT5v+6L/2gULJ1yY83EkKxGUnsTQNulDbK3PA==}
+  '@plumeria/turbopack-loader@10.0.4':
+    resolution: {integrity: sha512-Xy4YbLodJoR4otisLjNWRfpjRE+dIVsx2/xq3eJ6qxlCnKkYnADKykMe6l2ibcVeUJhyVmZtGmUC4m1n0Y/crw==}
 
-  '@plumeria/utils@9.0.0':
-    resolution: {integrity: sha512-fGFfpJWs16NUpSL7YANfoUkiLvHGufiNVzoLZHpZK8A9iayPxF2GykpZu0P20PhG1nLwzmfPsP6lLEaGw8vudA==}
+  '@plumeria/utils@10.0.4':
+    resolution: {integrity: sha512-5bFEsoUe/m7eJQRteGcn+GlCF2b+GfeKr4XMLyOgPzKGjgCTMqwuczalCiD/3aQIDbrckWAN//QhKEI5f65ZOQ==}
 
-  '@rust-gear/glob-darwin-arm64@0.2.8':
-    resolution: {integrity: sha512-2wObYrioG+ZEjhns2Ux/pna7J5tSVqCrYvfhXMneqqK/2Oj0R5ZJN0CSJiQLmSDtno8xlbV4r+xrlceKutcthA==}
+  '@rust-gear/glob-darwin-arm64@1.0.0':
+    resolution: {integrity: sha512-umbyvUthV9KNdoG4AuMEV/uBqZ45Nrt14IOq/PrjXxg45hj4EaSkYC+Yc4kK+KM09ABs1z15wLZ/nfvj57KqRA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@rust-gear/glob-darwin-x64@0.2.8':
-    resolution: {integrity: sha512-b6Ju6w6Zb24euWggL1JSLOoL3LoVvCz9cbZxnVyTPszsjflyn1L1AWaLkQhipN7fZdARMmHCY22t1qtj3xqzCQ==}
+  '@rust-gear/glob-darwin-x64@1.0.0':
+    resolution: {integrity: sha512-eCYFXGfOxuZKruuRagE1s3WkZH4bgiKWR9t9Eqd+UJWVjeo+jsyiq/s8VjjMEQSEpWM1s2XyQoQCpGwDOtovbA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@rust-gear/glob-linux-arm64-gnu@0.2.8':
-    resolution: {integrity: sha512-LE0CWPadesWZDC3M9pCvl3pw4abct1M6fmraKrF6bCAbCL2Q2+DVjExpkwTR8PVbtwWftC+U+PXzut+fFkSW6g==}
+  '@rust-gear/glob-linux-arm64-gnu@1.0.0':
+    resolution: {integrity: sha512-f4TdRT4+TTe3tbMyPX8MODeeISCA0SKKCeKIeXUGcQMCzEDCSOrBgDamO+p+VT7RRtx6QjsBr57SkrFJA3FzLQ==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@rust-gear/glob-linux-arm64-musl@0.2.8':
-    resolution: {integrity: sha512-JM3+rcdYOpa3O9yVkm0kyqazx1B1WOAOKINOp4FxHvYLCIM527VlBmr5JYGQtIjWejXh6J62cRP+pPeCCdqH6Q==}
+  '@rust-gear/glob-linux-arm64-musl@1.0.0':
+    resolution: {integrity: sha512-2aFbF97bUD06nGL7v5wfcp1tp1yfMPRkVaJCVWwgDDvfYUCrsfDpAEi7AhLFn/IyK0leTEbg/2uq/DDABsIIbg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@rust-gear/glob-linux-x64-gnu@0.2.8':
-    resolution: {integrity: sha512-26a9YS3kdGYzuUuI3c+jCQG4xr2/XsCQ8qX5ZjuNn5PO5Fts039GsxUmJwztWjEgR/O6VMZ1uj6MJ7a+r91Zuw==}
+  '@rust-gear/glob-linux-x64-gnu@1.0.0':
+    resolution: {integrity: sha512-G+7EujFK40RgJl+d0LjuZP2JN1d4HdHQ6fC7vmSmKU+FSWrSP9r/IfSGpTAluRpVA+b5+5M6z9IphD61tqy8Rg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@rust-gear/glob-linux-x64-musl@0.2.8':
-    resolution: {integrity: sha512-ZWRq0Hkyb4Gwl01s+zsw6RsN/YfRBiC9SqJaAp/eGr0s/scPhd7rrCY2KKXV9KvS/EfccNEapyp0AzF0nv5PyQ==}
+  '@rust-gear/glob-linux-x64-musl@1.0.0':
+    resolution: {integrity: sha512-umqsMBc8Trf3gZ4JqmCoNDXashD5x/tsn9cmJkQbIzD+zHQinvH5ctzMR+IO6bBIn9Wt4QCVtBPRKB4MeCgSjg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@rust-gear/glob-win32-arm64-msvc@0.2.8':
-    resolution: {integrity: sha512-o+ObkEQvooC8uodb9e/7ow1xdt8Gzt3E0PsX2vHAEC9YsenWJ0hmqM5HCfXRpgGdj9Hm4GoYdZ8oMOunYsUizA==}
+  '@rust-gear/glob-win32-arm64-msvc@1.0.0':
+    resolution: {integrity: sha512-4OhAXKzDRCOV9gdpQ5jF4NodDMNxZ9ERYiH0bVfPSfobmPzGeKntUuVRZNazghNzpHpyIeff81qedYECv03W/A==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@rust-gear/glob-win32-ia32-msvc@0.2.8':
-    resolution: {integrity: sha512-R6jooMQ/S1pf99UXmUd5aBES89LQzmMAz/ty3tWCx528mThxHYP4hkazgfuC00prPVxJE/JuTEEggzV5q9TNNg==}
+  '@rust-gear/glob-win32-ia32-msvc@1.0.0':
+    resolution: {integrity: sha512-0ytgFlxeQ4GxD6FkYi+6fL9iJmtX+2odd9McBQHntijRMDW/dzoH4SKx6vlEa+FHZTO9HphVNpE082PtrbBhog==}
     engines: {node: '>= 10'}
     cpu: [ia32]
     os: [win32]
 
-  '@rust-gear/glob-win32-x64-msvc@0.2.8':
-    resolution: {integrity: sha512-AW7jt+OIGHh8+/ZPHU/A09Rt4jmVm+f77mcRjIUZ2IyI9udiaebwCU219CF0xdYqvKjNQkFon8jgmSbR0mOjYA==}
+  '@rust-gear/glob-win32-x64-msvc@1.0.0':
+    resolution: {integrity: sha512-Yxdkeu/OFqOjd7sSm2I7i8hc+WfpXrYFIHabwfXrY9qFDgy6RvoO0EPy2ljzI2cBNFqf13GVBSws7+Bjb9nkFw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
 
-  '@rust-gear/glob@0.2.8':
-    resolution: {integrity: sha512-GnUZ7hbtN716jUWSBbFrYvDXWUPXqKDalugSQej5tMZOUdWgWKky1PPkEZCll8PUC3ylUxdrmbpRdis0HDV9RQ==}
+  '@rust-gear/glob@1.0.0':
+    resolution: {integrity: sha512-LxP+vIxEJEYHhgxHmA2fJkZLv/qt+E2SXJR4o3uTIwORUOZKUzpqKSIQtLl8sdPS6gOUwDxHkqnA3EF3y3AU9A==}
     engines: {node: '>=10'}
 
   '@swc/core-darwin-arm64@1.15.18':
@@ -541,8 +541,9 @@ packages:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
 
-  baseline-browser-mapping@2.9.11:
-    resolution: {integrity: sha512-Sg0xJUNDU1sJNGdfGWhVHX0kkZ+HWcvmVymJbj6NSgZZmW/8S9Y2HQ5euytnIgakgxN6papOAWiwDo1ctFDcoQ==}
+  baseline-browser-mapping@2.10.13:
+    resolution: {integrity: sha512-BL2sTuHOdy0YT1lYieUxTw/QMtPBC3pmlJC6xk8BBYVv6vcw3SGdKemQ+Xsx9ik2F/lYDO9tqsFQH1r9PFuHKw==}
+    engines: {node: '>=6.0.0'}
     hasBin: true
 
   brace-expansion@1.1.12:
@@ -831,8 +832,8 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
-  next@16.1.6:
-    resolution: {integrity: sha512-hkyRkcu5x/41KoqnROkfTm2pZVbKxvbZRuNvKXLRXxs3VfyO0WhY50TQS40EuKO9SW3rBj/sF3WbVwDACeMZyw==}
+  next@16.2.2:
+    resolution: {integrity: sha512-i6AJdyVa4oQjyvX/6GeER8dpY/xlIV+4NMv/svykcLtURJSy/WzDnnUk/TM4d0uewFHK7xSQz4TbIwPgjky+3A==}
     engines: {node: '>=20.9.0'}
     hasBin: true
     peerDependencies:
@@ -1012,8 +1013,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zss-engine@2.2.4:
-    resolution: {integrity: sha512-C7m3U5NW5sOFzvWr6CDTDTPmF+OftvIK2tNJvXWELJVUO7FMYWMpgqWpeKdBXNfy5Um/fCgdgqSS2PfFEoKpog==}
+  zss-engine@2.2.6:
+    resolution: {integrity: sha512-JKa6/39YnHJmSUjPdMb2fiHpl2V+heTkVPMpAGXVIVT/7ZdG1jdu1OY6XOoehjv6tJKK/8u/n+eFXc1FNdzkcA==}
 
 snapshots:
 
@@ -1176,30 +1177,30 @@ snapshots:
   '@img/sharp-win32-x64@0.34.5':
     optional: true
 
-  '@next/env@16.1.6': {}
+  '@next/env@16.2.2': {}
 
-  '@next/swc-darwin-arm64@16.1.6':
+  '@next/swc-darwin-arm64@16.2.2':
     optional: true
 
-  '@next/swc-darwin-x64@16.1.6':
+  '@next/swc-darwin-x64@16.2.2':
     optional: true
 
-  '@next/swc-linux-arm64-gnu@16.1.6':
+  '@next/swc-linux-arm64-gnu@16.2.2':
     optional: true
 
-  '@next/swc-linux-arm64-musl@16.1.6':
+  '@next/swc-linux-arm64-musl@16.2.2':
     optional: true
 
-  '@next/swc-linux-x64-gnu@16.1.6':
+  '@next/swc-linux-x64-gnu@16.2.2':
     optional: true
 
-  '@next/swc-linux-x64-musl@16.1.6':
+  '@next/swc-linux-x64-musl@16.2.2':
     optional: true
 
-  '@next/swc-win32-arm64-msvc@16.1.6':
+  '@next/swc-win32-arm64-msvc@16.2.2':
     optional: true
 
-  '@next/swc-win32-x64-msvc@16.1.6':
+  '@next/swc-win32-x64-msvc@16.2.2':
     optional: true
 
   '@oxlint/darwin-arm64@1.35.0':
@@ -1226,86 +1227,86 @@ snapshots:
   '@oxlint/win32-x64@1.35.0':
     optional: true
 
-  '@plumeria/compiler@9.0.0':
+  '@plumeria/compiler@10.0.4':
     dependencies:
-      '@plumeria/utils': 9.0.0
+      '@plumeria/utils': 10.0.4
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@plumeria/core@9.0.0':
+  '@plumeria/core@10.0.4':
     dependencies:
       csstype: 3.2.3
 
-  '@plumeria/eslint-plugin@9.0.0': {}
+  '@plumeria/eslint-plugin@10.0.4': {}
 
-  '@plumeria/next-plugin@9.0.0':
+  '@plumeria/next-plugin@10.0.4':
     dependencies:
-      '@plumeria/turbopack-loader': 9.0.0
+      '@plumeria/turbopack-loader': 10.0.4
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@plumeria/postcss-plugin@9.0.0':
+  '@plumeria/postcss-plugin@10.0.4':
     dependencies:
-      '@plumeria/compiler': 9.0.0
+      '@plumeria/compiler': 10.0.4
       postcss: 8.5.6
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@plumeria/turbopack-loader@9.0.0':
+  '@plumeria/turbopack-loader@10.0.4':
     dependencies:
-      '@plumeria/utils': 9.0.0
+      '@plumeria/utils': 10.0.4
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@plumeria/utils@9.0.0':
+  '@plumeria/utils@10.0.4':
     dependencies:
-      '@rust-gear/glob': 0.2.8
+      '@rust-gear/glob': 1.0.0
       '@swc/core': 1.15.18
       lightningcss: 1.30.2
       postcss: 8.5.6
       postcss-combine-media-query: 2.1.0(postcss@8.5.6)
-      zss-engine: 2.2.4
+      zss-engine: 2.2.6
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@rust-gear/glob-darwin-arm64@0.2.8':
+  '@rust-gear/glob-darwin-arm64@1.0.0':
     optional: true
 
-  '@rust-gear/glob-darwin-x64@0.2.8':
+  '@rust-gear/glob-darwin-x64@1.0.0':
     optional: true
 
-  '@rust-gear/glob-linux-arm64-gnu@0.2.8':
+  '@rust-gear/glob-linux-arm64-gnu@1.0.0':
     optional: true
 
-  '@rust-gear/glob-linux-arm64-musl@0.2.8':
+  '@rust-gear/glob-linux-arm64-musl@1.0.0':
     optional: true
 
-  '@rust-gear/glob-linux-x64-gnu@0.2.8':
+  '@rust-gear/glob-linux-x64-gnu@1.0.0':
     optional: true
 
-  '@rust-gear/glob-linux-x64-musl@0.2.8':
+  '@rust-gear/glob-linux-x64-musl@1.0.0':
     optional: true
 
-  '@rust-gear/glob-win32-arm64-msvc@0.2.8':
+  '@rust-gear/glob-win32-arm64-msvc@1.0.0':
     optional: true
 
-  '@rust-gear/glob-win32-ia32-msvc@0.2.8':
+  '@rust-gear/glob-win32-ia32-msvc@1.0.0':
     optional: true
 
-  '@rust-gear/glob-win32-x64-msvc@0.2.8':
+  '@rust-gear/glob-win32-x64-msvc@1.0.0':
     optional: true
 
-  '@rust-gear/glob@0.2.8':
+  '@rust-gear/glob@1.0.0':
     optionalDependencies:
-      '@rust-gear/glob-darwin-arm64': 0.2.8
-      '@rust-gear/glob-darwin-x64': 0.2.8
-      '@rust-gear/glob-linux-arm64-gnu': 0.2.8
-      '@rust-gear/glob-linux-arm64-musl': 0.2.8
-      '@rust-gear/glob-linux-x64-gnu': 0.2.8
-      '@rust-gear/glob-linux-x64-musl': 0.2.8
-      '@rust-gear/glob-win32-arm64-msvc': 0.2.8
-      '@rust-gear/glob-win32-ia32-msvc': 0.2.8
-      '@rust-gear/glob-win32-x64-msvc': 0.2.8
+      '@rust-gear/glob-darwin-arm64': 1.0.0
+      '@rust-gear/glob-darwin-x64': 1.0.0
+      '@rust-gear/glob-linux-arm64-gnu': 1.0.0
+      '@rust-gear/glob-linux-arm64-musl': 1.0.0
+      '@rust-gear/glob-linux-x64-gnu': 1.0.0
+      '@rust-gear/glob-linux-x64-musl': 1.0.0
+      '@rust-gear/glob-win32-arm64-msvc': 1.0.0
+      '@rust-gear/glob-win32-ia32-msvc': 1.0.0
+      '@rust-gear/glob-win32-x64-msvc': 1.0.0
 
   '@swc/core-darwin-arm64@1.15.18':
     optional: true
@@ -1402,7 +1403,7 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
-  baseline-browser-mapping@2.9.11: {}
+  baseline-browser-mapping@2.10.13: {}
 
   brace-expansion@1.1.12:
     dependencies:
@@ -1661,25 +1662,25 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next@16.1.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  next@16.2.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
-      '@next/env': 16.1.6
+      '@next/env': 16.2.2
       '@swc/helpers': 0.5.15
-      baseline-browser-mapping: 2.9.11
+      baseline-browser-mapping: 2.10.13
       caniuse-lite: 1.0.30001761
       postcss: 8.4.31
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
       styled-jsx: 5.1.6(react@19.2.4)
     optionalDependencies:
-      '@next/swc-darwin-arm64': 16.1.6
-      '@next/swc-darwin-x64': 16.1.6
-      '@next/swc-linux-arm64-gnu': 16.1.6
-      '@next/swc-linux-arm64-musl': 16.1.6
-      '@next/swc-linux-x64-gnu': 16.1.6
-      '@next/swc-linux-x64-musl': 16.1.6
-      '@next/swc-win32-arm64-msvc': 16.1.6
-      '@next/swc-win32-x64-msvc': 16.1.6
+      '@next/swc-darwin-arm64': 16.2.2
+      '@next/swc-darwin-x64': 16.2.2
+      '@next/swc-linux-arm64-gnu': 16.2.2
+      '@next/swc-linux-arm64-musl': 16.2.2
+      '@next/swc-linux-x64-gnu': 16.2.2
+      '@next/swc-linux-x64-musl': 16.2.2
+      '@next/swc-win32-arm64-msvc': 16.2.2
+      '@next/swc-win32-x64-msvc': 16.2.2
       sharp: 0.34.5
     transitivePeerDependencies:
       - '@babel/core'
@@ -1842,6 +1843,6 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zss-engine@2.2.4:
+  zss-engine@2.2.6:
     dependencies:
       csstype: 3.2.3
