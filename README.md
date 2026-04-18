@@ -50,8 +50,8 @@ For a fair comparison, both projects replicate the exact same component structur
 
 | Library      | Avg Build (s) | Min (s) | Max (s) | CSS Size (KB) | Lighthouse (Perf) |
 | :----------- | :-----------: | :-----: | :-----: | :-----------: | :---------------: |
-| **StyleX**   |    4.287s     | 4.160s  | 4.385s  |    6.82KB     |      100/100      |
-| **Plumeria** |    4.031s     | 3.940s  | 4.101s  |    6.40KB     |      100/100      |
+| **StyleX**   |    4.317s     | 4.185s  | 4.379s  |    6.82KB     |      100/100      |
+| **Plumeria** |    3.921s     | 3.865s  | 3.987s  |    6.40KB     |      100/100      |
 
 > [!NOTE]
 >
@@ -60,7 +60,7 @@ For a fair comparison, both projects replicate the exact same component structur
 
 ## Conclusion
 
-This benchmark confirms that Plumeria can achieve **reduced build time (approximately 6.0% reduction) and reduced bundle size (approximately 6.2% reduction)** while maintaining the same high level of execution performance as StyleX.
+This benchmark confirms that Plumeria can achieve **reduced build time (approximately 9.2% reduction) and reduced bundle size (approximately 6.2% reduction)** while maintaining the same high level of execution performance as StyleX.
 
 ## How to Run
 
