@@ -37,11 +37,11 @@ For a fair comparison, both projects replicate the exact same component structur
 
 ### Execution Environment
 
-- **Framework**: Next.js 16.2.2 (Turbopack mode)
+- **Framework**: Next.js 16.2.6 (Turbopack mode)
 - **React**: 19.2.4
-- **Libraries**: StyleX 0.18.3 / Plumeria 12.0.6
-- **Node.js**: v25.3.0
-- **pnpm**: v10.33.0
+- **Libraries**: StyleX 0.18.3 / Plumeria 13.1.0
+- **Node.js**: v25.8.2
+- **pnpm**: v11.3.0
 - **OS**: macOS Tahoe
 - **CPU**: Apple M1 Chip (8-core CPU, 8-core GPU)
 - **RAM**: 16GB
@@ -50,8 +50,8 @@ For a fair comparison, both projects replicate the exact same component structur
 
 | Library      | Avg Build (s) | Min (s) | Max (s) | CSS Size (KB) | Lighthouse (Perf) |
 | :----------- | :-----------: | :-----: | :-----: | :-----------: | :---------------: |
-| **StyleX**   |    4.137s     |  4.09s  |  4.16s  |    8.08KB     |      100/100      |
-| **Plumeria** |    3.907s     |  3.83s  |  3.98s  |    7.64KB     |      100/100      |
+| **StyleX**   |    4.164s     |  4.11s  |  4.23s  |    8.08KB     |      100/100      |
+| **Plumeria** |    3.956s     |  3.90s  |  4.04s  |    7.64KB     |      100/100      |
 
 > [!NOTE]
 >
@@ -60,7 +60,7 @@ For a fair comparison, both projects replicate the exact same component structur
 
 ## Conclusion
 
-This benchmark confirms that Plumeria can achieve **reduced build time (approximately 5.6% reduction) and reduced bundle size (approximately 5.4% reduction)** while maintaining the same high level of execution performance as StyleX.
+This benchmark confirms that Plumeria can achieve **reduced build time (approximately 5.0% reduction) and reduced bundle size (approximately 5.4% reduction)** while maintaining the same high level of execution performance as StyleX.
 
 ## How to Run
 
