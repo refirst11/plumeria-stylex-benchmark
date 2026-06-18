@@ -1,12 +1,7 @@
+minimumReleaseAge: 0
+
 allowBuilds:
   "@swc/core": true
-minimumReleaseAgeExclude:
-  - "@plumeria/compiler@13.1.0"
-  - "@plumeria/core@13.1.0"
-  - "@plumeria/eslint-plugin@13.1.0"
-  - "@plumeria/next-plugin@13.1.0"
-  - "@plumeria/postcss-plugin@13.1.0"
-  - "@plumeria/turbopack-loader@13.1.0"
-  - "@plumeria/utils@13.1.0"
+
 onlyBuiltDependencies:
   - "@swc/core"
