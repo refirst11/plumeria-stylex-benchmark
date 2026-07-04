@@ -15,10 +15,10 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@plumeria/core": "^14.0.0",
-    "@plumeria/eslint-plugin": "^14.0.0",
-    "@plumeria/next-plugin": "^14.0.0",
-    "@plumeria/postcss-plugin": "^14.0.0",
+    "@plumeria/core": "^14.2.1",
+    "@plumeria/eslint-plugin": "^14.2.1",
+    "@plumeria/next-plugin": "^14.2.1",
+    "@plumeria/postcss-plugin": "^14.2.1",
     "@types/node": "^24.8.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
