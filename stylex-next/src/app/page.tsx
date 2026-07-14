@@ -1,4 +1,3 @@
-import Image from "next/image";
 import styles from "./page.module.css";
 import StyleXComponent from "../component/StyleXComponent";
 import Test from "../component/Test";
