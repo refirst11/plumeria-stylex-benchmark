@@ -5,7 +5,9 @@ const styles = css.create({
     padding: "8px",
     fontSize: "16px",
     color: "blue",
-    border: "1px solid blue",
+    borderColor: "blue",
+    borderStyle: "solid",
+    borderWidth: "1px",
     borderRadius: "4px",
   },
   red: {
@@ -32,7 +34,9 @@ type PlumeriaComponentProps = {
 const PlumeriaComponent = ({ isRed }: PlumeriaComponentProps) => {
   return (
     <>
-      <div styleName={styles.base}>Hello from Plumeria!</div>
+      <div styleName={[styles.base, isRed && styles.red]}>
+        Hello from Plumeria!
+      </div>
       <div>
         <div styleName={styles2.container}>First</div>
         <div styleName={styles2.container}>Second</div>
