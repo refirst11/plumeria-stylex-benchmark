@@ -6,72 +6,45 @@ const styles = css.create({
     fontWeight: "500",
     transition: "all 0.2s ease",
   },
-  // Color variants
+});
+
+const colorStyles = css.create({
   red: { color: "red" },
   blue: { color: "blue" },
   green: { color: "green" },
   yellow: { color: "yellow" },
   purple: { color: "purple" },
-  // Size variants
+});
+
+const sizeStyles = css.create({
   small: { fontSize: "12px" },
   medium: { fontSize: "16px" },
   large: { fontSize: "20px" },
   xlarge: { fontSize: "24px" },
-  // Padding variants
-  paddingNone: { padding: "0" },
-  paddingSmall: { padding: "4px" },
-  paddingMedium: { padding: "8px" },
-  paddingLarge: { padding: "16px" },
-  paddingXlarge: { padding: "24px" },
-  // BorderRadius variants
-  radiusNone: { borderRadius: "0" },
-  radiusSmall: { borderRadius: "2px" },
-  radiusMedium: { borderRadius: "4px" },
-  radiusLarge: { borderRadius: "8px" },
-  radiusFull: { borderRadius: "9999px" },
-  // Background variants
-  bgTransparent: { backgroundColor: "transparent" },
-  bgWhite: { backgroundColor: "white" },
-  bgGray: { backgroundColor: "#f0f0f0" },
-  bgLightBlue: { backgroundColor: "#e3f2fd" },
-  bgLightGreen: { backgroundColor: "#e8f5e9" },
 });
 
-const getVariants = css.variants({
-  color: {
-    red: styles.red,
-    blue: styles.blue,
-    green: styles.green,
-    yellow: styles.yellow,
-    purple: styles.purple,
-  },
-  size: {
-    small: styles.small,
-    medium: styles.medium,
-    large: styles.large,
-    xlarge: styles.xlarge,
-  },
-  padding: {
-    none: styles.paddingNone,
-    small: styles.paddingSmall,
-    medium: styles.paddingMedium,
-    large: styles.paddingLarge,
-    xlarge: styles.paddingXlarge,
-  },
-  borderRadius: {
-    none: styles.radiusNone,
-    small: styles.radiusSmall,
-    medium: styles.radiusMedium,
-    large: styles.radiusLarge,
-    full: styles.radiusFull,
-  },
-  background: {
-    transparent: styles.bgTransparent,
-    white: styles.bgWhite,
-    gray: styles.bgGray,
-    lightBlue: styles.bgLightBlue,
-    lightGreen: styles.bgLightGreen,
-  },
+const paddingStyles = css.create({
+  none: { padding: "0" },
+  small: { padding: "4px" },
+  medium: { padding: "8px" },
+  large: { padding: "16px" },
+  xlarge: { padding: "24px" },
+});
+
+const borderRadiusStyles = css.create({
+  none: { borderRadius: "0" },
+  small: { borderRadius: "2px" },
+  medium: { borderRadius: "4px" },
+  large: { borderRadius: "8px" },
+  full: { borderRadius: "9999px" },
+});
+
+const backgroundStyles = css.create({
+  transparent: { backgroundColor: "transparent" },
+  white: { backgroundColor: "white" },
+  gray: { backgroundColor: "#f0f0f0" },
+  lightBlue: { backgroundColor: "#e3f2fd" },
+  lightGreen: { backgroundColor: "#e8f5e9" },
 });
 
 interface TestProps {
@@ -93,16 +66,14 @@ const Test = ({
     <div
       styleName={[
         styles.base,
-        getVariants({
-          color,
-          size,
-          padding,
-          borderRadius,
-          background,
-        }),
+        colorStyles[color],
+        sizeStyles[size],
+        paddingStyles[padding],
+        borderRadiusStyles[borderRadius],
+        backgroundStyles[background],
       ]}
     >
-      Plumeria Test Component with Dynamic Variants
+      Plumeria Test Component with Bracket Notation Variants
     </div>
   );
 };
