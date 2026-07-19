@@ -1,0 +1,10 @@
+packages:
+  - baseline-next/
+  - plumeria-next/
+  - stylex-next/
+
+allowBuilds:
+  "@swc/core": true
+  sharp: true
+
+minimumReleaseAge: 0
