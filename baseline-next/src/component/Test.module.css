@@ -1,0 +1,82 @@
+.base {
+  display: inline-block;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.red {
+  color: red;
+}
+.blue {
+  color: blue;
+}
+.green {
+  color: green;
+}
+.yellow {
+  color: yellow;
+}
+.purple {
+  color: purple;
+}
+
+.small {
+  font-size: 12px;
+}
+.medium {
+  font-size: 16px;
+}
+.large {
+  font-size: 20px;
+}
+.xlarge {
+  font-size: 24px;
+}
+
+.paddingNone {
+  padding: 0;
+}
+.paddingSmall {
+  padding: 4px;
+}
+.paddingMedium {
+  padding: 8px;
+}
+.paddingLarge {
+  padding: 16px;
+}
+.paddingXlarge {
+  padding: 24px;
+}
+
+.radiusNone {
+  border-radius: 0;
+}
+.radiusSmall {
+  border-radius: 2px;
+}
+.radiusMedium {
+  border-radius: 4px;
+}
+.radiusLarge {
+  border-radius: 8px;
+}
+.radiusFull {
+  border-radius: 9999px;
+}
+
+.bgTransparent {
+  background-color: transparent;
+}
+.bgWhite {
+  background-color: white;
+}
+.bgGray {
+  background-color: #f0f0f0;
+}
+.bgLightBlue {
+  background-color: #e3f2fd;
+}
+.bgLightGreen {
+  background-color: #e8f5e9;
+}

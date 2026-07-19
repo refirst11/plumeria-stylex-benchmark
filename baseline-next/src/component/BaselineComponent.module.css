@@ -1,0 +1,28 @@
+.base {
+  padding: 8px;
+  font-size: 16px;
+  color: blue;
+  border-color: blue;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+}
+
+.red {
+  color: red;
+  border-color: red;
+}
+
+.container {
+  margin-bottom: 0.5rem;
+}
+
+.container:last-child {
+  margin-bottom: 0;
+}
+
+@media screen and (min-width: 800px) {
+  .container {
+    margin-bottom: 0.75rem;
+  }
+}
