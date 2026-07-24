@@ -6,13 +6,13 @@ All three render the same DOM: 1,000 components combining five variant axes (`co
 
 |                         |  Build | Library Cost |        CSS |  SSR Chunk | Client JS¹ | Class names resolved |
 | :---------------------- | -----: | -----------: | ---------: | ---------: | ---------: | :------------------- |
-| _CSS Modules (control)_ | 3.521s |            — |     8.26KB |     3.91KB |          — | never merged         |
-| **Plumeria**            | 4.099s |  **578.1ms** | **7.79KB** | **2.60KB** | **0.84KB** | **at build**         |
-| **StyleX**              | 4.276s |      754.9ms |     8.08KB |     4.44KB |     2.67KB | at render, `styleq`  |
+| _CSS Modules (control)_ | 3.483s |            — |     8.26KB |     3.91KB |          — | never merged         |
+| **Plumeria**            | 3.892s |  **409.0ms** | **7.79KB** | **2.60KB** | **0.84KB** | **at build**         |
+| **StyleX**              | 4.108s |      624.9ms |     8.08KB |     4.44KB |     2.67KB | at render, `styleq`  |
 
 ### Key findings
 
-- **Build cost** — Plumeria is 23% cheaper to adopt: 578.1ms against StyleX's 754.9ms.
+- **Build cost** — Plumeria is 35% cheaper to adopt: 409.0ms against StyleX's 624.9ms.
 - **Shipped code** — StyleX sends **1.83KB more to the browser** once components are client-side, the bulk of it the `styleq` resolver. Plumeria ships no runtime.
 - **Runtime performance** — indistinguishable. Both score 100/100 on Lighthouse and prerender 1,000 components in ~210ms.
 
@@ -22,7 +22,7 @@ All three render the same DOM: 1,000 components combining five variant axes (`co
 
 - [Quick Start](#quick-start)
 - [Class Name Strategy](#class-name-strategy) — where the two libraries actually differ
-- [Output Sizes](#output-sizes) — why the totals look contradictory
+- [Output Sizes](#output-sizes) — why the raw totals mislead
 - [Build Cost](#build-cost)
 - [Method](#method)
 
@@ -130,9 +130,9 @@ So the map-plus-resolver design is free only while rendering stays on the server
 
 ## Output Sizes
 
-Two numbers look contradictory at first, and both are misleading without decomposition.
+The `.next` total and the prerendered output both come out marginally smaller for StyleX, and both numbers are misleading without decomposition — neither is served code, and neither reflects anything architectural.
 
-**`.next` totals favour Plumeria (7.18MB vs 7.19MB), but that is not served code.** The advantage is entirely artifacts a user never receives: source maps (17.3KB smaller) and build bookkeeping such as `.nft.json` and `.tsbuildinfo` (25.8KB smaller). Both library projects also carry ~0.89MB of `.next/build/chunks`, where Turbopack bundles the PostCSS config and plugins; the control has no such directory.
+**`.next` totals sit within ~15KB of each other (StyleX 7.19MB vs Plumeria 7.21MB), and that gap is not served code.** It is dominated by the one artifact decomposed next — Plumeria's prerendered output is ~26KB larger purely because its hash names are longer — which slightly outweighs Plumeria's 13.9KB _smaller_ source maps. Build bookkeeping (`.nft.json`, `.tsbuildinfo`) is a wash, within 4KB. Both library projects also carry ~0.89MB of `.next/build/chunks`, where Turbopack bundles the PostCSS config and plugins; the control has no such directory.
 
 **Plumeria's prerendered output is 25.8KB larger, but none of that is architectural.** Its hash names average 8.0 characters against StyleX's 7.6, and each name is emitted roughly eight times over — the rendered DOM plus the inlined RSC payload in `index.html`, then again in `index.rsc` and the two `.segment.rsc` files. The arithmetic closes exactly:
 
@@ -149,6 +149,36 @@ Whitespace and separator overhead are identical (6.86KB each); neither emits str
 | **StyleX**    |            882.05KB |             298.59KB |
 
 Both libraries are far ahead of CSS Modules regardless — its 29.8-character names alone cost 848KB.
+
+### Why the CSS column tips to Plumeria
+
+The stylesheet sizes (7.79 vs 8.08KB) invert what name length predicts. Plumeria's names are _longer_ (8.0 vs 7.6 characters) and it emits _more_ atoms (37 vs 34) — both should make its CSS larger. They don't, because **inside a stylesheet each atomic name appears exactly once**, in its own selector, so the 0.4-character difference is worth ~15 bytes across 37 rules. (This is the mirror of the prerender table above, where each name repeats thousands of times and the same 0.4 characters cost 26KB.) Name length is simply not what the CSS column measures.
+
+What it measures is **how many `:not(#\#)` specificity hacks each compiler stacks onto its selectors.** `:not(#\#)` matches every element — nothing has an id of literally `#` — so it changes no matching; it exists only to add one id's worth of specificity. Atomic CSS needs the tool: with one declaration per class, the cascade can no longer be steered by writing rules in a deliberate order, so specificity decides which atom wins when two touch the same property.
+
+The two spend it very differently:
+
+|              | `:not(#\#)` hacks | plain atoms | bumped atoms                 | extra                                                                    |
+| :----------- | ----------------: | ----------: | :--------------------------- | :----------------------------------------------------------------------- |
+| **Plumeria** |     16 (**144B**) |     23 / 37 | 14 (2 doubled)               | —                                                                        |
+| **StyleX**   |     51 (**459B**) |      5 / 34 | 29 (**19 doubled, 3 tripled**) | reset wrapped in `@layer` _and_ emitted twice; class doubled in the media rule (`.x….x…`) |
+
+Plumeria's count is not a heuristic. The level is just how many of two conditions hold — the declaration is a **longhand**, and it sits **inside a query**:
+
+|               | base | in query |
+| :------------ | ---: | -------: |
+| **shorthand** |    0 |        1 |
+| **longhand**  |    1 |        2 |
+
+That reproduces the stylesheet exactly. The 23 bare atoms are all shorthands or standalone properties (`padding`, `color`, `border-color` / `-style` / `-width`, `border-radius`, `display`, `transition`, `gap`); the 12 single-hack atoms are all longhands (`font-size`, `font-weight`, `background-color`, `margin-bottom`, `flex-wrap`); and the only two double-hack rules are longhands in a nested context — `margin-bottom` under `:last-child`, and `margin-bottom` inside the media query. `0×23 + 1×12 + 2×2 = 16`, the measured total.
+
+What the rule restores is the cascade relationship atomisation destroys. Split into one class per declaration, a longhand no longer outranks the shorthand it belongs to — `padding-top` and `padding` become two unrelated classes of equal weight — so the longhand is given exactly one level to win that back, and one more to clear the same property declared outside a query. Nothing is spent anywhere else.
+
+StyleX instead gives almost every atom a uniform specificity floor of one or two hacks and pushes the override-heavy rules to three, so any atom can win over any earlier one in any insertion order — the guarantee `styleq` leans on when it merges arbitrary style objects at render. That is a sound choice for a runtime merger, but on paper **the 35 extra hacks cost 315 bytes — more than the entire 302-byte gap between the two stylesheets.** Names, atom count, and formatting roughly cancel around it.
+
+Part of Plumeria's economy is positional rather than selectorial. Its `optimizer()` runs `postcss-combine-media-query`, which does not merely deduplicate `@media` blocks — it `remove()`s every one from its original position and `root.append()`s the merged blocks to the **end** of the stylesheet. That guarantee is what lets the two-level scale stay this short: a shorthand inside a query and a longhand outside one both land on level 1, and the tie is broken not by adding a third level but by the query block being, without exception, further down the file. StyleX buys no such guarantee: the same media rule is emitted as `.x….x…:not(#\#):not(#\#):not(#\#)` — the class doubled _and_ three hacks — precedence encoded entirely in the selector, holding wherever the rule lands and in whatever order code-split chunks insert their stylesheets.
+
+That is the real trade. Plumeria spends bytes only where a build-time merge cannot already decide the winner, and leans on a pipeline that controls placement; StyleX spends them everywhere so that placement never matters. So the CSS column is not measuring compression or name length; it is measuring two cascade strategies, and the ~4% gap is the price of StyleX's position-independence — still, at two components, well inside the noise the next note describes.
 
 > [!WARNING]
 > **This benchmark does not measure what atomic CSS is actually for.** StyleX was built at Meta to stop the stylesheet growing linearly with the codebase — facebook.com went from tens of megabytes of lazy-loaded CSS to a couple of hundred kilobytes, roughly an 80% cut, because atomic declarations deduplicate and the bundle _plateaus_ as components are added.
@@ -167,14 +197,14 @@ Library Cost = (project build time) − (baseline-next build time)
 
 | Library      | Avg Build (s) |    Min |    Max | SD (ms) | Library Cost |
 | :----------- | ------------: | -----: | -----: | ------: | -----------: |
-| _baseline_   |        3.521s | 3.502s | 3.596s |    29.1 |            — |
-| **Plumeria** |        4.099s | 4.027s | 4.241s |    64.9 |  **578.1ms** |
-| **StyleX**   |        4.276s | 4.234s | 4.329s |    31.9 |      754.9ms |
+| _baseline_   |        3.483s | 3.436s | 3.563s |    46.3 |            — |
+| **Plumeria** |        3.892s | 3.843s | 3.969s |    40.5 |  **409.0ms** |
+| **StyleX**   |        4.108s | 4.069s | 4.163s |    28.7 |      624.9ms |
 
 This measures everything adopting the library entails, not just time inside its compiler: loading the plugin packages, running a PostCSS pipeline the control never runs, and — for StyleX — a `babel.config.js` that moves the application source off Next.js's native SWC pipeline onto Babel. Most of that is fixed cost rather than work proportional to the styles compiled; neither library is spending 500ms on two component files, and the bulk is toolchain each one brings with it.
 
 > [!NOTE]
-> Library Cost varies by roughly ±100ms between full runs, being a difference of two wall-clock averages. The ordering and the ~180ms gap have been stable across runs.
+> Library Cost varies by roughly ±100ms between full runs, being a difference of two wall-clock averages. The ordering and the ~215ms gap have been stable across runs.
 
 ---
 
