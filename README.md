@@ -6,13 +6,13 @@ All three render the same DOM: 1,000 components combining five variant axes (`co
 
 |                         |  Build | Library Cost |        CSS |  SSR Chunk | Client JS¹ | Class names resolved |
 | :---------------------- | -----: | -----------: | ---------: | ---------: | ---------: | :------------------- |
-| _CSS Modules (control)_ | 3.483s |            — |     8.26KB |     3.91KB |          — | never merged         |
-| **Plumeria**            | 3.892s |  **409.0ms** | **7.79KB** | **2.60KB** | **0.84KB** | **at build**         |
-| **StyleX**              | 4.108s |      624.9ms |     8.08KB |     4.44KB |     2.67KB | at render, `styleq`  |
+| _CSS Modules (control)_ | 3.514s |            — |     8.26KB |     3.91KB |          — | never merged         |
+| **Plumeria**            | 3.932s |  **417.3ms** | **7.79KB** | **2.60KB** | **0.84KB** | **at build**         |
+| **StyleX**              | 4.112s |      597.7ms |     8.08KB |     4.44KB |     2.67KB | at render, `styleq`  |
 
 ### Key findings
 
-- **Build cost** — Plumeria is 35% cheaper to adopt: 409.0ms against StyleX's 624.9ms.
+- **Build cost** — Plumeria is 30% cheaper to adopt: 417.3ms against StyleX's 597.7ms.
 - **Shipped code** — StyleX sends **1.83KB more to the browser** once components are client-side, the bulk of it the `styleq` resolver. Plumeria ships no runtime.
 - **Runtime performance** — indistinguishable. Both score 100/100 on Lighthouse and prerender 1,000 components in ~210ms.
 
@@ -60,11 +60,11 @@ This is where the two libraries actually differ. Both resolve a variant like `co
 
 The thing to watch is **what each map is keyed by**, because that decides whether a last-wins merge is even possible at runtime:
 
-| Keyed by                         | Enables                                                                                                       |
-| :------------------------------- | :------------------------------------------------------------------------------------------------------------ |
-| local style name (`base`, `red`) | nothing — the key says nothing about which CSS property is being set, so overlapping rules cannot be reconciled |
-| variant value (`red`, `large`)   | nothing at runtime — the overlap was already resolved when the strings were baked                              |
-| CSS property (`kMwMTN` = `color`)| last-wins merge, since two rules touching the same property collide on the same key                            |
+| Keyed by                          | Enables                                                                                                         |
+| :-------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
+| local style name (`base`, `red`)  | nothing — the key says nothing about which CSS property is being set, so overlapping rules cannot be reconciled |
+| variant value (`red`, `large`)    | nothing at runtime — the overlap was already resolved when the strings were baked                               |
+| CSS property (`kMwMTN` = `color`) | last-wins merge, since two rules touching the same property collide on the same key                             |
 
 ### Plumeria — variant-keyed lookup tables, resolved at build time
 
@@ -101,8 +101,8 @@ styleq(base, color[c], size[s], padding[p], radius[r], background[b])
 
 Extracting just the class-name structures from each chunk — the maps themselves, with component code and the shared `page.module.css` map excluded — gives the like-for-like comparison:
 
-|               |  SSR chunk | Class-name structure                                              |    Runtime | Structure + runtime | Avg name |
-| :------------ | ---------: | :---------------------------------------------------------------- | ---------: | ------------------: | -------: |
+|               |  SSR chunk | Class-name structure                                               |    Runtime | Structure + runtime | Avg name |
+| :------------ | ---------: | :----------------------------------------------------------------- | ---------: | ------------------: | -------: |
 | _CSS Modules_ |     3.91KB | **1,211B** — name-keyed, 28 entries over two maps                  |          — |          **1,211B** |     29.8 |
 | **Plumeria**  | **2.60KB** | **885B** — 428B variant lookups + 457B baked class strings         |          — |            **885B** |      8.0 |
 | **StyleX**    |     4.44KB | **849B** — property-keyed, 25 `$$css` entries in 5 variant objects | **1,258B** |          **2,107B** |      7.6 |
@@ -158,9 +158,9 @@ What it measures is **how many `:not(#\#)` specificity hacks each compiler stack
 
 The two spend it very differently:
 
-|              | `:not(#\#)` hacks | plain atoms | bumped atoms                 | extra                                                                    |
-| :----------- | ----------------: | ----------: | :--------------------------- | :----------------------------------------------------------------------- |
-| **Plumeria** |     16 (**144B**) |     23 / 37 | 14 (2 doubled)               | —                                                                        |
+|              | `:not(#\#)` hacks | plain atoms | bumped atoms                   | extra                                                                                     |
+| :----------- | ----------------: | ----------: | :----------------------------- | :---------------------------------------------------------------------------------------- |
+| **Plumeria** |     16 (**144B**) |     23 / 37 | 14 (2 doubled)                 | —                                                                                         |
 | **StyleX**   |     51 (**459B**) |      5 / 34 | 29 (**19 doubled, 3 tripled**) | reset wrapped in `@layer` _and_ emitted twice; class doubled in the media rule (`.x….x…`) |
 
 Plumeria's count is not a heuristic. The level is just how many of two conditions hold — the declaration is a **longhand**, and it sits **inside a query**:
@@ -197,14 +197,14 @@ Library Cost = (project build time) − (baseline-next build time)
 
 | Library      | Avg Build (s) |    Min |    Max | SD (ms) | Library Cost |
 | :----------- | ------------: | -----: | -----: | ------: | -----------: |
-| _baseline_   |        3.483s | 3.436s | 3.563s |    46.3 |            — |
-| **Plumeria** |        3.892s | 3.843s | 3.969s |    40.5 |  **409.0ms** |
-| **StyleX**   |        4.108s | 4.069s | 4.163s |    28.7 |      624.9ms |
+| _baseline_   |        3.514s | 3.438s | 3.581s |    45.7 |            — |
+| **Plumeria** |        3.932s | 3.892s | 3.974s |    26.1 |  **417.3ms** |
+| **StyleX**   |        4.112s | 4.080s | 4.139s |    21.0 |      597.7ms |
 
 This measures everything adopting the library entails, not just time inside its compiler: loading the plugin packages, running a PostCSS pipeline the control never runs, and — for StyleX — a `babel.config.js` that moves the application source off Next.js's native SWC pipeline onto Babel. Most of that is fixed cost rather than work proportional to the styles compiled; neither library is spending 500ms on two component files, and the bulk is toolchain each one brings with it.
 
 > [!NOTE]
-> Library Cost varies by roughly ±100ms between full runs, being a difference of two wall-clock averages. The ordering and the ~215ms gap have been stable across runs.
+> Library Cost varies by roughly ±100ms between full runs, being a difference of two wall-clock averages. The ordering and the ~180ms gap have been stable across runs.
 
 ---
 
@@ -219,10 +219,10 @@ This measures everything adopting the library entails, not just time inside its 
 
 ### Environment
 
-| | |
-| :--- | :--- |
-| Framework | Next.js 16.2.10 (Turbopack) |
-| React | 19.2.4 |
-| Libraries | StyleX 0.19.0 · Plumeria 16.2.10 |
-| Runtime | Node v25.8.2 · pnpm 11.3.0 |
-| Machine | macOS Tahoe, Apple M1 (8-core), 16GB |
+|           |                                      |
+| :-------- | :----------------------------------- |
+| Framework | Next.js 16.2.10 (Turbopack)          |
+| React     | 19.2.4                               |
+| Libraries | StyleX 0.19.0 · Plumeria 16.4.2      |
+| Runtime   | Node v25.8.2 · pnpm 11.3.0           |
+| Machine   | macOS Tahoe, Apple M1 (8-core), 16GB |
