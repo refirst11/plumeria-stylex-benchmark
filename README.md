@@ -1,18 +1,20 @@
 # CSS-in-JS Benchmark: StyleX vs Plumeria
 
+Authored by the maintainer of Plumeria.
+
 Benchmarks Meta's **StyleX** against **Plumeria** on an identical Next.js app, with a third **CSS Modules** project as a no-library control.
 
 All three render the same DOM: 1,000 components combining five variant axes (`color`, `size`, `padding`, `borderRadius`, `background`), plus a component exercising nested media queries, `:last-child`, and conditional styles.
 
-|                         |  Build | Library Cost |        CSS |  SSR Chunk | Client JS¹ | Class names resolved |
-| :---------------------- | -----: | -----------: | ---------: | ---------: | ---------: | :------------------- |
-| _CSS Modules (control)_ | 3.514s |            — |     8.26KB |     3.91KB |          — | never merged         |
-| **Plumeria**            | 3.932s |  **417.3ms** | **7.79KB** | **2.60KB** | **0.84KB** | **at build**         |
-| **StyleX**              | 4.112s |      597.7ms |     8.08KB |     4.44KB |     2.67KB | at render, `styleq`  |
+|                         |  Build | Library Cost |        CSS |  SSR Chunk | Client JS¹ | Class names resolved       |
+| :---------------------- | -----: | -----------: | ---------: | ---------: | ---------: | :------------------------- |
+| _CSS Modules (control)_ | 3.483s |            — |     8.26KB |     3.91KB |     2.07KB | never merged               |
+| **Plumeria**            | 3.982s |  **498.4ms** | **7.79KB** | **2.60KB** | **0.84KB** | **at build**               |
+| **StyleX**              | 4.179s |      696.3ms |     8.08KB |     4.44KB |     2.67KB | at client render, `styleq` |
 
 ### Key findings
 
-- **Build cost** — Plumeria is 30% cheaper to adopt: 417.3ms against StyleX's 597.7ms.
+- **Build cost** — Plumeria is 28% cheaper to adopt: 498.4ms against StyleX's 696.3ms.
 - **Shipped code** — StyleX sends **1.83KB more to the browser** once components are client-side, the bulk of it the `styleq` resolver. Plumeria ships no runtime.
 - **Runtime performance** — indistinguishable. Both score 100/100 on Lighthouse and prerender 1,000 components in ~210ms.
 
@@ -35,7 +37,14 @@ pnpm install
 npm run bench
 ```
 
-Runs 10 cold builds of each project and prints the build table. To build one project on its own:
+Runs 10 cold builds of each project and prints the build table. To decompose what each styling layer actually emits:
+
+```bash
+npm run structure            # class-name structure and runtime, from the SSR chunks
+npm run structure -- --client   # also rebuilds each project with `Test.tsx` as a Client Component
+```
+
+To build one project on its own:
 
 ```bash
 cd plumeria-next && npm run build   # or stylex-next, baseline-next
@@ -48,6 +57,7 @@ baseline-next/          CSS Modules — no-library control
 plumeria-next/          Plumeria
 stylex-next/            StyleX
 scripts/benchmark.mjs   build-time harness
+scripts/structure.mjs   class-name structure / runtime decomposition
 ```
 
 The three projects are structurally identical. In each, `src/component/Test.tsx` renders the 1,000 variant components and `src/component/*Component.tsx` carries the complex-style case; only the styling layer differs.
@@ -77,17 +87,56 @@ className: "xo8omt7h x6vb0uvf x1wwwd6e "
 
 **One literal per variant axis, inlined at the call site and keyed by the variant value.** The compiler has already decided which class wins for every reachable combination, so the render is one O(1) property read per axis plus a concatenation. No runtime is shipped, and no merge happens — there is nothing left to merge.
 
+#### Conflicts cluster, the rest concatenates
+
+The five axes above are independent — `color`, `size`, `padding`, `borderRadius` and `background` each set a different property — so nothing overlaps and every axis stays its own table. When declarations _do_ collide the compiler splits the output in two: **non-conflicting atoms are concatenated into a static prefix, and only the conflicting ones are clustered into a bracket.** `PlumeriaComponent.tsx` is that case — `base` sets `color: blue` and `borderColor: blue`, `red` overrides both, and the choice is a runtime boolean:
+
+```jsx
+<div styleName={[styles.base, isRed && styles.red]}>
+```
+
+compiles to
+
+```js
+className: "xymmdeuh xbm90xtb xragrh7v xmt672rk x4vahbk7 " +
+  ({ 0: "xgmn1kmt xvxlh81m", 1: "xq96bg3w xtopzak1" }[a ? "1" : "0"] ||
+    "xgmn1kmt xvxlh81m");
+```
+
+verbatim from the SSR chunk, where `a` is `isRed` after minification. The trailing `||` is the same default guard the variant tables carry as `||""`; here `a?"1":"0"` can only produce keys the object already has, so it is emitted but unreachable.
+
+`base` declares seven properties but only five reach the prefix. The two that `red` also sets are lifted out and appear once per branch, already reduced to the winner:
+
+|               | atoms                                          | declarations                                                        |
+| :------------ | :--------------------------------------------- | :------------------------------------------------------------------ |
+| static prefix | `xymmdeuh xbm90xtb xragrh7v xmt672rk x4vahbk7` | `padding` `font-size` `border-style` `border-width` `border-radius` |
+| branch `0`    | `xgmn1kmt xvxlh81m`                            | `color:#00f` `border-color:#00f`                                    |
+| branch `1`    | `xq96bg3w xtopzak1`                            | `color:red` `border-color:red`                                      |
+
+**What is baked is the class name each branch produces — not which rules ship.** Both `.xgmn1kmt{color:#00f}` and `.xq96bg3w{color:red}` are in the stylesheet and have to be: `isRed` is a runtime value, so both branches are reachable and both atoms must exist for either to be selectable. The build eliminates the _merge_, not the CSS — the same distinction drawn in [Where the resolver is paid for](#where-the-resolver-is-paid-for), where what a build resolves is the output rather than the code.
+
+Clustering is also what keeps the enumeration small. It is scoped to each set of mutually conflicting declarations rather than to the axes as a whole, so independent axes compose by concatenation instead of multiplying — the five in `Test.tsx` produce five tables, not one table of 5×4×5×5×5.
+
 ### StyleX — property-keyed hash map, resolved at render time
 
 ```js
-// the map: 25 entries, 0.71KB
+// the maps: 5 objects, 24 variant values, 849B
 const color = { red: {kMwMTN:"x1e2nbdu", $$css:!0}, blue: {kMwMTN:"xju2f9n", $$css:!0}, … };
 
-// the resolver: 1.23KB of bundled styleq
+// the resolver: 1,247B of inlined styleq, plus a 172B props() wrapper
 styleq(base, color[c], size[s], padding[p], radius[r], background[b])
 ```
 
 **Each key (`kMwMTN`) is a hash of the CSS property, not of the style name**, and `$$css` marks the object as pre-compiled. Because two rules setting `color` collide on that key, `styleq` can walk the arguments in reverse and keep only the first hit per property — last argument wins. That is the same merge Plumeria performs during the build, kept alive at render instead, at the cost of a bundled resolver.
+
+"At render time" applies to the variant case, not to everything. Given the boolean conflict of `StyleXComponent.tsx` — the same `isRed && styles.red` shape shown above — the Babel plugin resolves it at build exactly as Plumeria does, emitting a 153B branch table of finished class strings and never calling `styleq`:
+
+```js
+{0:{className:"xe8ttls x1j61zf2 xju2f9n x1118g2m x1y0btm7 xmkeg23 x12oqio5"},
+ 1:{className:"xe8ttls x1j61zf2 x1y0btm7 xmkeg23 x12oqio5 x1e2nbdu x71xlcl"}}[0|!!isRed]
+```
+
+What it does not bake is the variant case, where the axis values arrive as props. Nothing makes that impossible — Plumeria bakes it by enumerating each axis's declared values rather than its call sites — but StyleX keeps the `$$css` objects intact and defers to `styleq`. That is the case `Test.tsx` measures, and the one that costs a resolver.
 
 ### CSS Modules — name-keyed map, no merge at all
 
@@ -99,17 +148,24 @@ styleq(base, color[c], size[s], padding[p], radius[r], background[b])
 
 ### The size of that choice
 
-Extracting just the class-name structures from each chunk — the maps themselves, with component code and the shared `page.module.css` map excluded — gives the like-for-like comparison:
+Extracting just the class-name structures from each chunk — the maps themselves, with component code and the shared `page.module.css` map excluded — gives the like-for-like comparison. `npm run structure` reproduces every number in this section:
 
-|               |  SSR chunk | Class-name structure                                               |    Runtime | Structure + runtime | Avg name |
-| :------------ | ---------: | :----------------------------------------------------------------- | ---------: | ------------------: | -------: |
-| _CSS Modules_ |     3.91KB | **1,211B** — name-keyed, 28 entries over two maps                  |          — |          **1,211B** |     29.8 |
-| **Plumeria**  | **2.60KB** | **885B** — 428B variant lookups + 457B baked class strings         |          — |            **885B** |      8.0 |
-| **StyleX**    |     4.44KB | **849B** — property-keyed, 25 `$$css` entries in 5 variant objects | **1,258B** |          **2,107B** |      7.6 |
+|               |  SSR chunk | Class-name structure                                                                        |    Runtime | Structure + runtime | Avg name |
+| :------------ | ---------: | :------------------------------------------------------------------------------------------ | ---------: | ------------------: | -------: |
+| _CSS Modules_ |     3.91KB | **1,215B** — name-keyed, 28 entries over two maps                                           |          — |          **1,215B** |     29.8 |
+| **Plumeria**  | **2.60KB** | **652B** — 428B variant lookups + 45B conflict table + 179B baked strings                   |          — |            **652B** |      8.0 |
+| **StyleX**    |     4.44KB | **1,143B** — 849B `$$css` variant maps + 63B base + 153B conflict table + 78B baked strings | **1,419B** |          **2,562B** |      7.6 |
 
-**The inversion in that table is the whole story: StyleX has the smallest structure of the three.** 849B against Plumeria's 885B — a 36B difference that is really just the shorter hash names. As data structures the two designs are equivalent.
+The sharpest comparison is the five variant axes, because both compilers encode the _same 24 values_ there — five colors, four sizes, five paddings, five radii, five backgrounds:
 
-What separates them is the 1,258B of `styleq` that has to come along to interpret it — **a resolver 1.5x the size of the map it resolves.** Plumeria carries no such thing because the merge already happened, so it lands 1.4x smaller in total despite the marginally larger map. CSS Modules has the largest structure, its keys and values both being human-readable long names, but still comes in under StyleX by having nothing to ship at runtime. At the whole-chunk level this shows up as **StyleX being 1.84KB larger than Plumeria.**
+|              | five variant axes | per value | emitted form                       |
+| :----------- | ----------------: | --------: | :--------------------------------- |
+| **Plumeria** |          **428B** | **17.8B** | `red:"xq96bg3w"`                   |
+| **StyleX**   |              849B |     35.4B | `red:{kMwMTN:"x1e2nbdu",$$css:!0}` |
+
+**StyleX spends twice the bytes to encode identical information.** The extra ~18B per value is not the class name — StyleX's names are marginally _shorter_ — it is the wrapper: an object per value, a property-hash key, and the `$$css` marker. That wrapper is exactly what makes a runtime merge possible, since it is the property key that lets two rules touching `color` collide. It is the price of the design, paid per variant value, before any resolver is shipped.
+
+Then the resolver is shipped anyway: **1,419B, made of 1,247B of inlined `styleq` plus a 172B `props()` wrapper at the call site** — more than the entire structure it interprets. Plumeria carries neither, so it lands **3.9x smaller in total**, 652B against 2,562B. CSS Modules sits between them: its 28 entries cost 1,215B because both keys and values are human-readable long names, but with nothing to ship at runtime it still comes in under half of StyleX. At the whole-chunk level this shows up as **StyleX being 1.84KB larger than Plumeria.**
 
 Note that this is not a per-render cost. `styleq` caches merges in a `WeakMap` keyed on the style objects themselves, and with a handful of variant objects reused across 1,000 components the cache is warm almost immediately. Merging is not where the two differ — **shipping the resolver is.**
 
@@ -117,12 +173,15 @@ Note that this is not a per-render cost. `styleq` caches merges in a `WeakMap` k
 
 In this benchmark the components are Server Components on a statically prerendered route, so `styleq` runs at build time and never reaches the browser — neither project puts styling code in `static/chunks`. That changes the moment a styled component becomes a Client Component, which is the normal case for variant-driven UI. Marking `Test.tsx` with `"use client"` and rebuilding:
 
-|              | Client chunk | Contents                                            |
-| :----------- | -----------: | :-------------------------------------------------- |
-| **Plumeria** |   **0.84KB** | class name strings only                             |
-| **StyleX**   |       2.67KB | `styleq` runtime + 0.71KB `$$css` map + class names |
+|               |      Client chunk | of which structure |    Runtime | Contents                                    |
+| :------------ | ----------------: | -----------------: | ---------: | :------------------------------------------ |
+| _CSS Modules_ |   2,120B (2.07KB) |             1,061B |          — | `Test.module.css` name map + variant tables |
+| **Plumeria**  | **861B** (0.84KB) |           **457B** |          — | five variant lookups + the baked prefix     |
+| **StyleX**    |   2,733B (2.67KB) |               912B | **1,419B** | `styleq` + `props()` wrapper + `$$css` maps |
 
-**StyleX ships 1.83KB more to the browser**, mostly `styleq` itself, and that resolver then runs on hydration and on every client re-render. Plumeria has nothing to ship — the strings were resolved during the build, and only the concatenation survives into the bundle.
+**StyleX ships 1.83KB more to the browser than Plumeria**, mostly `styleq` itself, and that resolver then runs on hydration and on every client re-render. Plumeria has no runtime to ship — the merge was resolved during the build, and only the lookup tables and the concatenation survive into the bundle.
+
+CSS Modules is the one to read carefully here, because "no runtime" is not the same as "nothing shipped". Its map is **byte-identical in the SSR and client chunks — 1,061B in both** — so the whole structure crosses to the browser unchanged, and at 29.6 characters per name it is larger than Plumeria's entire client chunk. What CSS Modules avoids is the resolver, not the payload.
 
 So the map-plus-resolver design is free only while rendering stays on the server **and the route stays static**. `prerender-manifest.json` reports `initialRevalidateSeconds: false` here, so the page renders once at build time and every request is served from the generated HTML. Under ISR or a dynamic route the resolver runs again per regeneration or per request; in a client-rendered React app it runs on every render, always. Note also that `styleq` is not eliminated by the build even when it never executes — it stays in `.next/server/chunks/ssr/` and is listed among the 113 traced dependencies in `page.js.nft.json`. What is resolved at build time is the _output_, not the code.
 
@@ -197,14 +256,14 @@ Library Cost = (project build time) − (baseline-next build time)
 
 | Library      | Avg Build (s) |    Min |    Max | SD (ms) | Library Cost |
 | :----------- | ------------: | -----: | -----: | ------: | -----------: |
-| _baseline_   |        3.514s | 3.438s | 3.581s |    45.7 |            — |
-| **Plumeria** |        3.932s | 3.892s | 3.974s |    26.1 |  **417.3ms** |
-| **StyleX**   |        4.112s | 4.080s | 4.139s |    21.0 |      597.7ms |
+| _baseline_   |        3.483s | 3.421s | 3.567s |    54.4 |            — |
+| **Plumeria** |        3.982s | 3.908s | 4.054s |    49.2 |  **498.4ms** |
+| **StyleX**   |        4.179s | 4.130s | 4.255s |    34.3 |      696.3ms |
 
 This measures everything adopting the library entails, not just time inside its compiler: loading the plugin packages, running a PostCSS pipeline the control never runs, and — for StyleX — a `babel.config.js` that moves the application source off Next.js's native SWC pipeline onto Babel. Most of that is fixed cost rather than work proportional to the styles compiled; neither library is spending 500ms on two component files, and the bulk is toolchain each one brings with it.
 
 > [!NOTE]
-> Library Cost varies by roughly ±100ms between full runs, being a difference of two wall-clock averages. The ordering and the ~180ms gap have been stable across runs.
+> Library Cost varies by roughly ±100ms between full runs, being a difference of two wall-clock averages. The ordering and the ~198ms gap have been stable across runs.
 
 ---
 
@@ -214,7 +273,7 @@ This measures everything adopting the library entails, not just time inside its 
 - **Sizes**: computed by summing actual file sizes recursively, not `du`, which rounds every file to a disk block.
 - **Served payload**: `.next` minus source maps, `build/` toolchain, and bookkeeping (`.nft.json`, `.tsbuildinfo`, `cache/`).
 - **Client chunk**: measured in a separate build with `Test.tsx` marked `"use client"`, isolating what each library's `import` pulls into `static/chunks`. Reverted afterwards; the committed projects are Server Components.
-- **Class-name structure**: extracted from the SSR chunk by matching each strategy's emitted form — `a.v({…})` for CSS Modules, variant object literals and baked class strings for Plumeria, `{k…:"x…",$$css:!0}` objects for StyleX — and summing their byte lengths. Component code is excluded, as is the `page.module.css` map, which is identical CSS Modules output in all three projects.
+- **Class-name structure**: `npm run structure` (add `--client` for the client-chunk column). It splits the SSR chunk on Turbopack module boundaries, then inside each module takes the maximal object literals whose every string is class-name payload, plus the class-name strings outside them. A string counts as payload only if all its space-separated tokens appear as selectors in the project's own generated CSS — which is what keeps a variant _value_ like `"xlarge"`, or the string `"p"` in a framework chunk, from being mistaken for a class. `styleq` is inlined rather than given its own module, so it is carved out by brace-matching from its `styleq=void 0` preamble. Component code is excluded, as is the `page.module.css` map, which is identical CSS Modules output in all three projects.
 - **Lighthouse**: `next start` (production), 1,000 components displayed.
 
 ### Environment
@@ -223,6 +282,6 @@ This measures everything adopting the library entails, not just time inside its 
 | :-------- | :----------------------------------- |
 | Framework | Next.js 16.2.10 (Turbopack)          |
 | React     | 19.2.4                               |
-| Libraries | StyleX 0.19.0 · Plumeria 16.4.2      |
+| Libraries | StyleX 0.19.0 · Plumeria 16.5.0      |
 | Runtime   | Node v25.8.2 · pnpm 11.3.0           |
 | Machine   | macOS Tahoe, Apple M1 (8-core), 16GB |
