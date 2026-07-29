@@ -64,7 +64,7 @@ const Test = ({
 }: TestProps) => {
   return (
     <div
-      styleName={[
+      classStyle={[
         styles.base,
         colorStyles[color],
         sizeStyles[size],
