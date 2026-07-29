@@ -34,13 +34,13 @@ type PlumeriaComponentProps = {
 const PlumeriaComponent = ({ isRed }: PlumeriaComponentProps) => {
   return (
     <>
-      <div styleName={[styles.base, isRed && styles.red]}>
+      <div classStyle={[styles.base, isRed && styles.red]}>
         Hello from Plumeria!
       </div>
       <div>
-        <div styleName={styles2.container}>First</div>
-        <div styleName={styles2.container}>Second</div>
-        <div styleName={styles2.container}>Last</div>
+        <div classStyle={styles2.container}>First</div>
+        <div classStyle={styles2.container}>Second</div>
+        <div classStyle={styles2.container}>Last</div>
       </div>
     </>
   );
