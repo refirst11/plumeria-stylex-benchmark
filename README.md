@@ -1,6 +1,6 @@
 # CSS-in-JS Benchmark: StyleX vs Plumeria
 
-Authored by the maintainer of Plumeria.
+Authored by the maintainer of Plumeria. Every number here is reproducible with `npm run bench`.
 
 Benchmarks Meta's **StyleX** against **Plumeria** on an identical Next.js app, with a third **CSS Modules** project as a no-library control.
 
