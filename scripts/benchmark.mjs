@@ -7,7 +7,12 @@ import { performance } from "perf_hooks";
 // components, styled with plain CSS Modules and no CSS-in-JS library. The cost
 // of each library is simply how much longer its build takes than the baseline's.
 const BASELINE_PROJECT = "baseline-next";
-const projects = [BASELINE_PROJECT, "plumeria-next", "stylex-next"];
+const projects = [
+  BASELINE_PROJECT,
+  "plumeria-next",
+  "stylex-next",
+  "tailwind-next",
+];
 const rootDir = process.cwd();
 
 const ITERATIONS = 10;
