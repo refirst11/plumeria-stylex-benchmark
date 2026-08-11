@@ -2,6 +2,7 @@ packages:
   - baseline-next/
   - plumeria-next/
   - stylex-next/
+  - tailwind-next/
 
 allowBuilds:
   "@swc/core": true
