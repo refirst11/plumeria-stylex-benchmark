@@ -22,6 +22,7 @@ const projects = {
   "baseline-next": "CSS Modules",
   "plumeria-next": "Plumeria",
   "stylex-next": "StyleX",
+  "tailwind-next": "Tailwind",
 };
 const rootDir = process.cwd();
 
@@ -73,6 +74,39 @@ function readFiles(dir, filter) {
 // React element type in the framework chunks.
 const GENERATED = /-module__|^x[a-z0-9]{5,}$/;
 
+// Tailwind's utility names -- `p-2`, `border`, `min-[800px]:mb-3` -- match
+// neither pattern in GENERATED, and loosening that regex enough to admit
+// `border` would also admit every one-word string in the framework chunks. So
+// Tailwind gets its authority from a narrower place instead: the `@layer
+// utilities` block, which by construction contains exactly the utilities the
+// scanner generated for this project's source and nothing hand-written.
+function utilityLayerNames(source, names) {
+  const open = source.indexOf("@layer utilities");
+  if (open === -1) return;
+  const start = source.indexOf("{", open);
+  if (start === -1) return;
+
+  let depth = 0;
+  let end = start;
+  for (; end < source.length; end++) {
+    if (source[end] === "{") depth++;
+    else if (source[end] === "}" && --depth === 0) break;
+  }
+
+  // A selector token, with Tailwind's CSS escapes (`.min-\[800px\]\:mb-3`)
+  // kept as part of the name and unescaped back to its JS spelling. An
+  // unescaped `:` ends the name, so `.last\:mb-0:last-child` yields
+  // `last:mb-0` rather than swallowing the pseudo-class. The leading character
+  // must be a letter or an escape: without that, the `.` of a decimal in a
+  // declaration matches too, and `rounded-full`'s `border-radius:3.40282e38px`
+  // enters the authority set as `40282e38px`.
+  for (const [, raw] of source
+    .slice(start, end)
+    .matchAll(/\.((?:[A-Za-z_]|\\.)(?:[^\s{},:>+~()[\]\\]|\\.)*)/g)) {
+    names.add(raw.replace(/\\(.)/g, "$1"));
+  }
+}
+
 // Every class name the build actually emitted a rule for. This is the authority
 // on what counts as a class name in the JS.
 function cssClassNames(projectPath) {
@@ -84,6 +118,7 @@ function cssClassNames(projectPath) {
     for (const [, name] of source.matchAll(/\.([A-Za-z_][\w-]*)/g)) {
       if (GENERATED.test(name)) names.add(name);
     }
+    utilityLayerNames(source, names);
   }
   return names;
 }
@@ -281,12 +316,20 @@ function withClientComponent(projectPath, fn) {
   }
 }
 
+// Anchored on the same marker the SSR side uses. For the `x`-prefixed atoms a
+// payload match is proof enough of authorship, but Tailwind's authority set
+// contains whole English words -- oxide generates `.flex` after finding the
+// string `"flex"` in `page.tsx`'s inline styles -- and a bare `"flex"` occurs
+// in the framework chunks too. Requiring the component under test to be in the
+// chunk keeps that collision out without a hand-maintained denylist.
 function clientChunks(projectPath, classNames) {
   return readFiles(
     path.join(projectPath, ".next/static/chunks"),
     (name) => name.endsWith(".js"),
-  ).filter(({ source }) =>
-    stringLiterals(source).some((l) => isClassPayload(l.value, classNames)),
+  ).filter(
+    ({ source }) =>
+      source.includes(APP_MARKER) &&
+      stringLiterals(source).some((l) => isClassPayload(l.value, classNames)),
   );
 }
 
