@@ -1,0 +1,88 @@
+name: Benchmark
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/benchmark.yml"
+      - "scripts/**"
+      - "*-next/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: benchmark-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    name: Ubuntu benchmark
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.3.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 25.8.2
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run cold-build benchmark
+        shell: bash
+        run: npm run bench | tee benchmark.log
+
+      - name: Measure server and client structure
+        shell: bash
+        run: npm run structure -- --client | tee structure.log
+
+      - name: Publish job summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Benchmark environment"
+            echo
+            echo "- Runner: ubuntu-24.04"
+            echo "- Node: $(node --version)"
+            echo "- pnpm: $(pnpm --version)"
+            echo
+            echo "## Cold-build benchmark"
+            echo
+            echo '```text'
+            cat benchmark.log 2>/dev/null || echo "Benchmark did not produce a log."
+            echo '```'
+            echo
+            echo "## Bundle structure"
+            echo
+            echo '```text'
+            cat structure.log 2>/dev/null || echo "Structure measurement did not produce a log."
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload raw benchmark logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-logs-${{ github.run_id }}
+          path: |
+            benchmark.log
+            structure.log
+          if-no-files-found: warn
+          retention-days: 90
