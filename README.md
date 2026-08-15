@@ -10,10 +10,10 @@ All four render the same DOM: 1,000 components combining five variant axes (`col
 
 |                         |  Build | Library Cost |     CSS | SSR Chunk | Client JS¹ | Class names resolved       |
 | :---------------------- | -----: | -----------: | ------: | --------: | ---------: | :------------------------- |
-| _CSS Modules (control)_ | 3.815s |            — |  8.26KB |    3.91KB |     2.07KB | never merged               |
-| **Plumeria**            | 3.913s | +98ms (noise) |  7.78KB |    2.60KB |     0.84KB | at build                   |
-| **Tailwind**            | 3.875s | +60ms (noise) | 14.28KB |    2.67KB |     0.89KB | nothing to resolve         |
-| **StyleX**              | 4.483s |       +668ms |  8.08KB |    4.44KB |     2.67KB | at client render, `styleq` |
+| _CSS Modules (control)_ | 3.812s |            — |  8.26KB |    3.91KB |     2.07KB | never merged               |
+| **Plumeria**            | 3.895s | +83ms (noise) |  7.78KB |    2.60KB |     0.84KB | at build                   |
+| **Tailwind**            | 3.837s | +25ms (noise) | 14.28KB |    2.67KB |     0.89KB | nothing to resolve         |
+| **StyleX**              | 4.484s |       +672ms |  8.08KB |    4.44KB |     2.67KB | at client render, `styleq` |
 
 The first three ship no styling runtime at all. StyleX is the only one that does.
 
@@ -179,7 +179,7 @@ This benchmark leans toward what Plumeria optimizes for, so it is worth being ex
 
 **Merging styles the compiler never saw.** Plumeria can bake the merge because each axis's values are declared in one place and enumerable at build time. StyleX's `props()` accepts arbitrary style objects at render — styles passed as props across module and package boundaries, composed by callers no compiler run ever saw together — and merges them deterministically, last-wins. That composition pattern is idiomatic StyleX and has no build-time equivalent.
 
-**Insertion-order independence.** Both libraries encode shorthand ancestry into selector specificity, so a descendant property outranks every shorthand ancestor regardless of stylesheet insertion order. Their models differ: StyleX assigns properties to four fixed priority tiers, while Plumeria 18.2.7 recursively computes the maximum depth across physical and logical shorthand paths. The [CSS section](#css-three-cascade-strategies) shows why the resulting hack counts differ without implying a weaker guarantee.
+**Insertion-order independence.** Both libraries encode shorthand ancestry into selector specificity, so a descendant property outranks every shorthand ancestor regardless of stylesheet insertion order. Their models differ: StyleX assigns properties to four fixed priority tiers, while Plumeria 18.2.14 recursively computes the maximum depth across physical and logical shorthand paths. The [CSS section](#css-three-cascade-strategies) shows why the resulting hack counts differ without implying a weaker guarantee.
 
 **The resolver is cheap to run, not cheap to ship.** `styleq` caches merges in a `WeakMap` keyed on the style objects, and with a handful of variant objects reused across 1,000 components the cache is warm almost immediately. The recurring cost is the 1.4KB on the wire and the work on hydration and re-render, not a per-element merge.
 
@@ -198,12 +198,12 @@ This benchmark leans toward what Plumeria optimizes for, so it is worth being ex
 
 | Library      | Avg Build |    Min |    Max | SD (ms) |      Library Cost |
 | :----------- | --------: | -----: | -----: | ------: | ----------------: |
-| _baseline_   |    3.815s | 3.706s | 3.942s |    82.9 |                 — |
-| **Plumeria** |    3.913s | 3.876s | 3.961s |    25.6 | +97.9ms (noise) |
-| **Tailwind** |    3.875s | 3.815s | 3.982s |    52.9 | +59.8ms (noise) |
-| **StyleX**   |    4.483s | 4.437s | 4.534s |    31.7 |      **+667.5ms** |
+| _baseline_   |    3.812s | 3.756s | 3.874s |    38.0 |                 — |
+| **Plumeria** |    3.895s | 3.809s | 4.027s |    65.9 |   +82.7ms (noise) |
+| **Tailwind** |    3.837s | 3.800s | 3.899s |    33.9 |   +25.0ms (noise) |
+| **StyleX**   |    4.484s | 4.443s | 4.592s |    43.6 |      **+672.1ms** |
 
-Only StyleX's range is clearly separated from the baseline. Plumeria and Tailwind average 97.9ms and 59.8ms slower respectively, but both min–max ranges overlap the baseline; this run cannot separate those differences from measurement noise. Read both as "≈ 0.1s or less" and StyleX's ~0.7s as real.
+Only StyleX's range is clearly separated from the baseline. Plumeria and Tailwind average 82.7ms and 25.0ms slower respectively, but both min–max ranges overlap the baseline; this run cannot separate those differences from measurement noise. Read both as "≈ 0.1s or less" and StyleX's ~0.7s as real.
 
 This measures everything adopting the library entails, not just time inside its compiler. Most of StyleX's ~0.7s is fixed toolchain cost rather than work proportional to the two styled components: its `babel.config.js` moves the application source off Next.js's native SWC pipeline onto Babel, and a PostCSS pass runs on top.
 
@@ -315,7 +315,7 @@ Which is exactly what this app's stylesheet contains:
 
 `10×1 + 16×2 + 3×3 = 51` for StyleX. Its fixed tiers deliberately give properties such as `color` two hacks even though no shorthand in this fixture can set them.
 
-Plumeria 18.2.7 instead calls `getPropertyDepth()` from `zss-engine 2.4.2`. It walks every physical and logical shorthand path recursively, uses the maximum depth, and repeats `:not(#\#)` once per ancestor. A root shorthand such as `margin` is x0; `margin-block` is x1; and the physical `margin-bottom` is x2 because it is reachable both directly and through `margin-block`. Likewise, `border-top-color` is x3 through `border → border-block → border-block-color → border-top-color`. Query and pseudo-selector rules add one more tier.
+Plumeria 18.2.14 instead calls `getPropertyDepth()` from `zss-engine 2.5.0`. It walks every physical and logical shorthand path recursively, uses the maximum depth, and repeats `:not(#\#)` once per ancestor. A root shorthand such as `margin` is x0; `margin-block` is x1; and the physical `margin-bottom` is x2 because it is reachable both directly and through `margin-block`. Likewise, `border-top-color` is x3 through `border → border-block → border-block-color → border-top-color`. Query and pseudo-selector rules add one more tier.
 
 The generated CSS confirms the model: `font-size`, `background-color`, `font-weight`, and `border-color/-style/-width` are x1; the ordinary `margin-bottom` is x2; and its `@media` and `:last-child` forms receive the extra tier and become x3. That produces 22 hacks. The 29-hack gap accounts for 261B of the 313B stylesheet difference, but it does **not** mean Plumeria leaves shorthand conflicts to source order.
 
@@ -356,6 +356,6 @@ globals.css (hand-written, shared)      3,713B
 | :-------- | :--------------------------------------------------- |
 | Framework | Next.js 16.2.10 (Turbopack)                          |
 | React     | 19.2.4                                               |
-| Libraries | StyleX 0.19.0 · Plumeria 18.2.7 · Tailwind CSS 4.3.3 |
+| Libraries | StyleX 0.19.0 · Plumeria 18.2.14 · Tailwind CSS 4.3.3 |
 | Runtime   | Node v25.8.2 · pnpm 11.3.0                           |
 | Machine   | macOS Tahoe, Apple M1 (8-core), 16GB                 |
