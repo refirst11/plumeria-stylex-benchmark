@@ -15,9 +15,9 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@plumeria/core": "^18.2.14",
-    "@plumeria/eslint-plugin": "^18.2.14",
-    "@plumeria/next-plugin": "^18.2.14",
+    "@plumeria/core": "^18.2.16",
+    "@plumeria/eslint-plugin": "^18.2.16",
+    "@plumeria/next-plugin": "^18.2.16",
     "@types/node": "^24.8.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
