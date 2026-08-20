@@ -10,10 +10,10 @@ All four render the same DOM: 1,000 components combining five variant axes (`col
 
 |                         |  Build | Library Cost |     CSS | SSR Chunk | Client JS¹ | Class names resolved       |
 | :---------------------- | -----: | -----------: | ------: | --------: | ---------: | :------------------------- |
-| _CSS Modules (control)_ | 3.766s |            — |  8.26KB |    3.91KB |     2.07KB | never merged               |
-| **Plumeria**            | 3.831s | +65ms (noise) |  7.78KB |    2.60KB |     0.84KB | at build                   |
-| **Tailwind**            | 3.808s | +42ms (noise) | 14.28KB |    2.67KB |     0.89KB | nothing to resolve         |
-| **StyleX**              | 4.417s |       +650ms |  8.08KB |    4.44KB |     2.67KB | at client render, `styleq` |
+| _CSS Modules (control)_ | 3.677s |            — |  8.26KB |    3.91KB |     2.07KB | never merged               |
+| **Plumeria**            | 3.765s | +88ms (noise) |  7.78KB |    2.60KB |     0.84KB | at build                   |
+| **Tailwind**            | 3.639s | −38ms (noise) | 14.28KB |    2.67KB |     0.89KB | nothing to resolve         |
+| **StyleX**              | 4.263s |       +585ms |  8.08KB |    4.44KB |     2.67KB | at client render, `styleq` |
 
 The first three ship no styling runtime at all. StyleX is the only one that does.
 
@@ -22,7 +22,7 @@ The table above is the Apple M1 measurement used in the article. The same comman
 > [!NOTE]
 > **These are measurements, not verdicts.** Everything here was measured in good faith, but on one machine, one set of versions, and one fixture. Your hardware, your framework and bundler versions, the size and shape of your codebase, and factors nobody thought to control for can all move these numbers — in places by enough to reorder the table. The harness is in this repo precisely so the results can be re-run rather than taken on trust. Run `npm run bench` against your own environment before drawing a conclusion about your own project.
 
-- **Build cost** — only StyleX's clears the noise floor. Plumeria and Tailwind overlap the control's measured range in this run. Most of StyleX's ~0.65s is toolchain: a `babel.config.js` that moves the app off Next.js's SWC pipeline, plus a PostCSS pass. See [Build Cost](#build-cost).
+- **Build cost** — only StyleX's clears the noise floor. Plumeria and Tailwind overlap the control's measured range in this run. Most of StyleX's ~0.6s is toolchain: a `babel.config.js` that moves the app off Next.js's SWC pipeline, plus a PostCSS pass. See [Build Cost](#build-cost).
 - **What ships** — once components are client-side, StyleX sends **1.83KB more to the browser** than Plumeria, mostly its `styleq` resolver. See [Class Name Strategy](#class-name-strategy).
 - **What runs** — every library here executes code during `next build`. Only StyleX leaves something behind that runs again. See [What Runs, and What Survives It](#what-runs-and-what-survives-it).
 - **What the runtime buys** — StyleX's resolver is not waste; it merges style objects the compiler never saw and makes correctness independent of stylesheet order. See [The Trade](#the-trade).
@@ -179,7 +179,7 @@ This benchmark leans toward what Plumeria optimizes for, so it is worth being ex
 
 **Merging styles the compiler never saw.** Plumeria can bake the merge because each axis's values are declared in one place and enumerable at build time. StyleX's `props()` accepts arbitrary style objects at render — styles passed as props across module and package boundaries, composed by callers no compiler run ever saw together — and merges them deterministically, last-wins. That composition pattern is idiomatic StyleX and has no build-time equivalent.
 
-**Insertion-order independence.** Both libraries encode shorthand ancestry into selector specificity, so a descendant property outranks every shorthand ancestor regardless of stylesheet insertion order. Their models differ: StyleX assigns properties to four fixed priority tiers, while Plumeria 18.2.16 recursively computes the maximum depth across physical and logical shorthand paths. The [CSS section](#css-three-cascade-strategies) shows why the resulting hack counts differ without implying a weaker guarantee.
+**Insertion-order independence.** Both libraries encode shorthand ancestry into selector specificity, so a descendant property outranks every shorthand ancestor regardless of stylesheet insertion order. Their models differ: StyleX assigns properties to four fixed priority tiers, while Plumeria 18.2.25 recursively computes the maximum depth across physical and logical shorthand paths. The [CSS section](#css-three-cascade-strategies) shows why the resulting hack counts differ without implying a weaker guarantee.
 
 **The resolver is cheap to run, not cheap to ship.** `styleq` caches merges in a `WeakMap` keyed on the style objects, and with a handful of variant objects reused across 1,000 components the cache is warm almost immediately. The recurring cost is the 1.4KB on the wire and the work on hydration and re-render, not a per-element merge.
 
@@ -198,14 +198,14 @@ This benchmark leans toward what Plumeria optimizes for, so it is worth being ex
 
 | Library      | Avg Build |    Min |    Max | SD (ms) |      Library Cost |
 | :----------- | --------: | -----: | -----: | ------: | ----------------: |
-| _baseline_   |    3.766s | 3.661s | 3.858s |    69.1 |                 — |
-| **Plumeria** |    3.831s | 3.779s | 3.872s |    30.8 |   +65.1ms (noise) |
-| **Tailwind** |    3.808s | 3.781s | 3.850s |    23.6 |   +41.6ms (noise) |
-| **StyleX**   |    4.417s | 4.334s | 4.471s |    41.9 |      **+650.4ms** |
+| _baseline_   |    3.677s | 3.583s | 3.780s |    56.8 |                 — |
+| **Plumeria** |    3.765s | 3.707s | 3.836s |    40.3 |   +87.7ms (noise) |
+| **Tailwind** |    3.639s | 3.619s | 3.680s |    21.0 |   −37.9ms (noise) |
+| **StyleX**   |    4.263s | 4.213s | 4.342s |    45.2 |      **+585.3ms** |
 
-Only StyleX's range is clearly separated from the baseline. Plumeria and Tailwind average 65.1ms and 41.6ms slower respectively, but both min–max ranges overlap the baseline; this run cannot separate those differences from measurement noise. Read both as "≈ 0.1s or less" and StyleX's ~0.65s as real.
+Only StyleX's range is clearly separated from the baseline. Plumeria averages 87.7ms slower, and Tailwind came in 37.9ms _faster_ than the control — its whole min–max range sits inside the baseline's, and Plumeria's overlaps it too; this run cannot separate either difference from measurement noise. Read both as "≈ 0.1s or less" and StyleX's ~0.6s as real.
 
-This measures everything adopting the library entails, not just time inside its compiler. Most of StyleX's ~0.65s is fixed toolchain cost rather than work proportional to the two styled components: its `babel.config.js` moves the application source off Next.js's native SWC pipeline onto Babel, and a PostCSS pass runs on top.
+This measures everything adopting the library entails, not just time inside its compiler. Most of StyleX's ~0.6s is fixed toolchain cost rather than work proportional to the two styled components: its `babel.config.js` moves the application source off Next.js's native SWC pipeline onto Babel, and a PostCSS pass runs on top.
 
 Plumeria's is what remains after v17 removed its own PostCSS pipeline — the compiler now runs as a Turbopack loader through `withPlumeria()`. In the 16.x measurements that pipeline made the cost ~500ms.
 
@@ -230,9 +230,9 @@ Measured from the build outputs of the run above, by summing real file sizes (`d
 
 |               | `.next` total | source maps | `build/` toolchain | page prerender | everything else |
 | :------------ | ------------: | ----------: | -----------------: | -------------: | --------------: |
-| _CSS Modules_ |        6.84MB |   3,581.5KB |                  — |      1,479.1KB |       1,939.1KB |
-| **Plumeria**  |    **6.51MB** |   3,699.4KB |             75.7KB |        954.3KB |       1,941.9KB |
-| **Tailwind**  |        7.32MB |   4,071.3KB |            312.5KB |      1,170.9KB |       1,943.9KB |
+| _CSS Modules_ |        6.84MB |   3,581.5KB |                  — |      1,479.1KB |       1,939.2KB |
+| **Plumeria**  |    **6.52MB** |   3,699.4KB |             75.7KB |        954.3KB |       1,942.0KB |
+| **Tailwind**  |        7.32MB |   4,071.3KB |            312.5KB |      1,170.9KB |       1,944.0KB |
 | **StyleX**    |        7.19MB |   4,144.8KB |            357.6KB |        928.3KB |       1,936.5KB |
 
 None of the gap is served to users: source maps and `build/` are both toolchain artifacts.
@@ -242,7 +242,7 @@ None of the gap is served to users: source maps and `build/` are both toolchain 
 > [!NOTE]
 > **No library's compiler is bundled into `.next`.** Every loader and plugin here is resolved from `node_modules` at build time and executed, never bundled. What lands in `.next/build/` is Turbopack's own child-process host for evaluating them — plus, for any project with a `postcss.config.js`, the PostCSS runtime itself.
 >
-> The test is the module-id namespace. Chunks under `[turbopack-node]/` and `[externals]/` are Turbopack's; only `[project]/` ids come from the app's `node_modules`. Plumeria's `build/` contains **zero** `[project]/` modules, and grepping it for `atomicHash`, `createAtomicMapTable`, `splitCssRules` or the string `plumeria` returns nothing — the loader's own `dist/index.js` is 108.0KB, larger than the entire 75.7KB directory.
+> The test is the module-id namespace. Chunks under `[turbopack-node]/` and `[externals]/` are Turbopack's; only `[project]/` ids come from the app's `node_modules`. Plumeria's `build/` contains **zero** `[project]/` modules, and grepping it for `atomicHash`, `createAtomicMapTable`, `splitCssRules` or the string `plumeria` returns nothing — the loader's own `dist/index.js` is 108.3KB, larger than the entire 75.7KB directory.
 
 |               | `build/` | Turbopack host | PostCSS runtime |
 | :------------ | -------: | -------------: | --------------: |
@@ -315,7 +315,7 @@ Which is exactly what this app's stylesheet contains:
 
 `10×1 + 16×2 + 3×3 = 51` for StyleX. Its fixed tiers deliberately give properties such as `color` two hacks even though no shorthand in this fixture can set them.
 
-Plumeria 18.2.16 instead calls `getPropertyDepth()` from `zss-engine 2.6.0`. It walks every physical and logical shorthand path recursively, uses the maximum depth, and repeats `:not(#\#)` once per ancestor. A root shorthand such as `margin` is x0; `margin-block` is x1; and the physical `margin-bottom` is x2 because it is reachable both directly and through `margin-block`. Likewise, `border-top-color` is x3 through `border → border-block → border-block-color → border-top-color`. Query and pseudo-selector rules add one more tier.
+Plumeria 18.2.25 instead calls `getPropertyDepth()` from `zss-engine 2.6.0`. It walks every physical and logical shorthand path recursively, uses the maximum depth, and repeats `:not(#\#)` once per ancestor. A root shorthand such as `margin` is x0; `margin-block` is x1; and the physical `margin-bottom` is x2 because it is reachable both directly and through `margin-block`. Likewise, `border-top-color` is x3 through `border → border-block → border-block-color → border-top-color`. Query and pseudo-selector rules add one more tier.
 
 The generated CSS confirms the model: `font-size`, `background-color`, `font-weight`, and `border-color/-style/-width` are x1; the ordinary `margin-bottom` is x2; and its `@media` and `:last-child` forms receive the extra tier and become x3. That produces 22 hacks. The 29-hack gap accounts for 261B of the 313B stylesheet difference, but it does **not** mean Plumeria leaves shorthand conflicts to source order.
 
@@ -356,6 +356,6 @@ globals.css (hand-written, shared)      3,713B
 | :-------- | :--------------------------------------------------- |
 | Framework | Next.js 16.2.10 (Turbopack)                          |
 | React     | 19.2.4                                               |
-| Libraries | StyleX 0.19.0 · Plumeria 18.2.16 · Tailwind CSS 4.3.3 |
+| Libraries | StyleX 0.19.0 · Plumeria 18.2.25 · Tailwind CSS 4.3.3 |
 | Runtime   | Node v25.8.2 · pnpm 11.3.0                           |
 | Machine   | macOS Tahoe, Apple M1 (8-core), 16GB                 |
